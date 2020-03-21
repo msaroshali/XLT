@@ -59,6 +59,11 @@ public class SummaryStatistics
      */
     public void addValue(final int value)
     {
+        // turn this into an integer multiplication first and cast later
+        sumOfSquares += (double) ((long) value * (long) value);
+        count++;
+        sum += value;
+
         if (value > maximum)
         {
             maximum = value;
@@ -68,11 +73,6 @@ public class SummaryStatistics
         {
             minimum = value;
         }
-
-        count++;
-
-        sum += value;
-        sumOfSquares += (double) value * (double) value;
     }
 
     /**
