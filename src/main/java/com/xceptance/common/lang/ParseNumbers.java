@@ -28,13 +28,14 @@ public final class ParseNumbers
     private static final int BASE = 10;
     
     /**
-     * Parses the string and returns the result as long. Raises a NumberFormatException in case of a non-convertible
-     * string. Falls back to JDK code in case of an error.
+     * Parses the string and returns the result as int. Raises a NumberFormatException in case of an non-convertable
+     * string. Due to conversion limitations, the content of s might be larger than an int, precision might be
+     * inaccurate.
      * 
      * @param s
      *            the string to parse
-     * @return the converted string as long
-     * @throws NumberFormatException
+     * @return the converted string as int
+     * @throws java.lang.NumberFormatException
      */
     public static long parseLong(final String s)
     {
@@ -50,7 +51,7 @@ public final class ParseNumbers
         // no string
         if (length == 0)
         {
-            throw new NumberFormatException("empty");
+            throw new NumberFormatException("length = 0");
         }
         
         try
@@ -58,28 +59,28 @@ public final class ParseNumbers
             long value = 0;
             for (int i = 0; i < length; i++)
             {
-                final int digit = s.charAt(i) - DIGITOFFSET;
+                final int digit = s.charAt(i);
 
-                if (digit >= 0 && digit <= 9)
+                if (digit >= '0' && digit <= '9')
                 {
-                    value = value * BASE + digit;
+                    value = ((value << 3) + (value << 1)) + (digit - DIGITOFFSET);
                 }
                 else
                 {
-                    throw new NumberFormatException(s);
+                    throw new NumberFormatException();
                 }
             }
 
             return value;
         }
-        catch (final NumberFormatException e)
+        catch (final Exception e)
         {
             return Long.parseLong(s);
         }
     }
 
     /**
-     * Parses the string and returns the result as int. Raises a NumberFormatException in case of a non-convertible
+     * Parses the string and returns the result as int. Raises a NumberFormatException in case of an non-convertable
      * string. Due to conversion limitations, the content of s might be larger than an int, precision might be
      * inaccurate.
      * 
@@ -90,20 +91,41 @@ public final class ParseNumbers
      */
     public static int parseInt(final String s)
     {
+        // no string
+        if (s == null)
+        {
+            throw new NumberFormatException("null");
+        }
+
+        // determine length
+        final int length = s.length();
+        
+        if (length == 0)
+        {
+            throw new NumberFormatException("length = 0");
+        }
         try
         {
-            return (int) parseLong(s);
+            int value = 0;
+            for (int i = 0; i < length; i++)
+            {
+                final int digit = s.charAt(i);
+                
+                if (digit >= '0' && digit <= '9')
+                {
+                    value = ((value << 3) + (value << 1)) + (digit - DIGITOFFSET);
         }
-        catch (final NumberFormatException e)
+                else
         {
-            return Integer.parseInt(s);
+                    throw new NumberFormatException();
         }
     }
 
-    /**
-     * Private to prevent instances of this class.
-     */
-    private ParseNumbers()
+            return value;
+        }
+        catch (final Exception e)
     {
+            return Integer.parseInt(s);
+        }
     }
 }
