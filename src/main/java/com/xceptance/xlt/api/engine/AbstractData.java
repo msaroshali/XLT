@@ -21,6 +21,7 @@ import java.util.List;
 
 import com.xceptance.common.lang.ParseNumbers;
 import com.xceptance.common.util.CsvUtils;
+import com.xceptance.common.util.CsvUtilsDecode;
 
 /**
  * The {@link AbstractData} class may be the super class of a special data record class.
@@ -85,7 +86,7 @@ public abstract class AbstractData implements Data
     @Override
     public final void fromCSV(final String s)
     {
-        final String[] fields = CsvUtils.decode(s, DELIMITER);
+        final List<String> fields = CsvUtilsDecode.parse(s.toCharArray(), DELIMITER);
         parseValues(fields);
     }
 
@@ -225,20 +226,20 @@ public abstract class AbstractData implements Data
      * @param values
      *            the list of values, must have at least the length {@link #getMinNoCSVElements()}
      */
-    protected void parseValues(final String[] values)
+    protected void parseValues(final List<String> values)
     {
-        if (values.length < getMinNoCSVElements())
+        if (values.size() < getMinNoCSVElements())
         {
             throw new IllegalArgumentException(String.format("Expected at least %d fields, but got only %d -> %s", getMinNoCSVElements(),
-                                                             values.length, Arrays.toString(values)));
+                                                             values.size(), values));
         }
 
         // check the type code
-        if (values[0].equals(typeCode))
+        if (values.get(0).equals(typeCode))
         {
             // read and check the values
-            name = values[1];
-            time = ParseNumbers.parseLong(values[2]);
+            name = values.get(1);
+            time = ParseNumbers.parseLong(values.get(2));
 
             if (time <= 0)
             {
@@ -247,7 +248,7 @@ public abstract class AbstractData implements Data
         }
         else
         {
-            throw new IllegalArgumentException("Cannot recreate the object state. The read type code '" + values[0] +
+            throw new IllegalArgumentException("Cannot recreate the object state. The read type code '" + values.get(0) +
                                                "' does not match the expected type code '" + typeCode + "'.");
         }
     }
