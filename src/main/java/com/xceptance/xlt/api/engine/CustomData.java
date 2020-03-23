@@ -42,7 +42,7 @@ public class CustomData extends TimerData
      */
     public CustomData()
     {
-        this(null);
+        super(TYPE_CODE);
     }
 
     /**
@@ -55,5 +55,11 @@ public class CustomData extends TimerData
     public CustomData(final String name)
     {
         super(name, TYPE_CODE);
+    }
+
+    @Override
+    public Data newInstance()
+    {
+        return new CustomData();
     }
 }

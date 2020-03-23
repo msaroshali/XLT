@@ -44,7 +44,7 @@ public class PageLoadTimingData extends TimerData
      */
     public PageLoadTimingData()
     {
-        this(null);
+        super(TYPE_CODE);
     }
 
     /**
@@ -57,5 +57,11 @@ public class PageLoadTimingData extends TimerData
     public PageLoadTimingData(final String name)
     {
         super(name, TYPE_CODE);
+    }
+
+    @Override
+    public Data newInstance()
+    {
+        return new PageLoadTimingData();
     }
 }

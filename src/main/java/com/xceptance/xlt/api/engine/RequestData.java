@@ -148,7 +148,7 @@ public class RequestData extends TimerData
      */
     public RequestData()
     {
-        this(null);
+        super(TYPE_CODE);
     }
 
     /**
@@ -706,5 +706,11 @@ public class RequestData extends TimerData
         {
             setDnsTime(ParseNumbers.parseInt(values[20]));
         }
+    }
+
+    @Override
+    public Data newInstance()
+    {
+        return new RequestData();
     }
 }
