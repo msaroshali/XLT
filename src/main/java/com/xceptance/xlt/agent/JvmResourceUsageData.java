@@ -20,6 +20,7 @@ import java.util.List;
 import com.xceptance.common.lang.ParseNumbers;
 import com.xceptance.xlt.api.engine.AbstractData;
 import com.xceptance.xlt.api.engine.Data;
+import com.xceptance.xlt.api.engine.GlobalClock;
 
 /**
  * The {@link JvmResourceUsageData} class holds resource usage statistics for the current agent JVM. Currently, this
@@ -600,11 +601,5 @@ public class JvmResourceUsageData extends AbstractData
         {
             totalCpuUsage = Double.parseDouble(values.get(22));
         }
-    }
-
-    @Override
-    public Data newInstance()
-    {
-        return new JvmResourceUsageData();
     }
 }
