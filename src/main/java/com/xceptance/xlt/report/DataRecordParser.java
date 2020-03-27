@@ -209,7 +209,7 @@ class DataRecordParser implements Runnable
             final String msg = String.format("Failed to parse data record at line %,d in file '%s': %s", lineNumber, lineChunk.getFile(),
                                              ex);
             LOG.error(msg);
-            System.out.println(msg);
+            ex.printStackTrace();
 
             return null;
         }
@@ -282,7 +282,6 @@ class DataRecordParser implements Runnable
             {
                 final String msg = String.format("Failed to apply request merge rule: %s\n%s", requestProcessingRule, t);
                 LOG.error(msg);
-                System.out.println(msg);
 
                 // restore the request's original name
                 requestData.setName(originalName);
