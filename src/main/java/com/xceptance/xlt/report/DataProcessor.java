@@ -68,11 +68,6 @@ public class DataProcessor
     private final StatisticsProcessor dataRecordProcessor;
 
     /**
-     * The thread that runs the data processor.
-     */
-    private final Thread dataRecordProcessorThread;
-
-    /**
      * The executor dealing with the data record reader threads.
      */
     private final ExecutorService dataRecordReaderExecutor;
@@ -142,8 +137,11 @@ public class DataProcessor
         testCaseFilter = new StringMatcher(testCaseIncludePatternList, testCaseExcludePatternList, true);
         agentFilter = new StringMatcher(agentIncludePatternList, agentExcludePatternList, true);
 
+        // the one and only data record processor
+        dataRecordProcessor = new StatisticsProcessor(reportProviders);
+
         // create the dispatcher
-        dispatcher = new Dispatcher(config);
+        dispatcher = new Dispatcher(config, dataRecordProcessor);
 
         // create the reader executor
         dataRecordReaderExecutor = Executors.newFixedThreadPool(config.readerThreadCount, new DaemonThreadFactory(i -> "DataRecordReader-" + i, Thread.MAX_PRIORITY));
@@ -161,14 +159,6 @@ public class DataProcessor
         }
 
         LOG.info(String.format("Reading files from input directory '%s' ...\n", inputDir));
-        
-        // the one and only data record processor
-        dataRecordProcessor = new StatisticsProcessor(reportProviders, dispatcher, config.statisticsThreadCount);
-
-        dataRecordProcessorThread = new Thread(dataRecordProcessor, "StatisticsProcessor");
-        dataRecordProcessorThread.setDaemon(true);
-        dataRecordProcessorThread.setPriority(Thread.MAX_PRIORITY);
-        dataRecordProcessorThread.start();
     }
 
     /**
@@ -231,7 +221,6 @@ public class DataProcessor
         finally
         {
             // stop background threads
-            dataRecordProcessorThread.interrupt();
             dataRecordParserExecutor.shutdownNow();
             dataRecordReaderExecutor.shutdownNow();
         }
