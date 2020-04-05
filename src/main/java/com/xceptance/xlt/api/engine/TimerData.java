@@ -29,7 +29,7 @@ public abstract class TimerData extends AbstractData
     /**
      * The runtime of the request.
      */
-    private long runTime;
+    private int runTime;
     
     /**
      * Indicates whether or not the request was successful.
@@ -76,7 +76,7 @@ public abstract class TimerData extends AbstractData
      * 
      * @return the run time
      */
-    public long getRunTime()
+    public int getRunTime()
     {
         return runTime;
     }
@@ -108,7 +108,7 @@ public abstract class TimerData extends AbstractData
      */
     public void setRunTime()
     {
-        runTime = GlobalClock.getInstance().getTime() - getTime();
+        runTime = (int) (GlobalClock.getInstance().getTime() - getTime());
     }
 
     /**
@@ -119,7 +119,7 @@ public abstract class TimerData extends AbstractData
      */
     public void setRunTime(final long runTime)
     {
-        this.runTime = runTime;
+        this.runTime = (int) runTime;
     }
 
     /**
@@ -146,7 +146,7 @@ public abstract class TimerData extends AbstractData
         super.parseValues(values);
 
         // read and check the values
-        runTime = ParseNumbers.parseLong(values.get(3));
+        runTime = ParseNumbers.parseInt(values.get(3));
 
         if (runTime < 0)
         {

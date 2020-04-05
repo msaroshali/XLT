@@ -37,7 +37,6 @@ import org.jfree.data.time.TimeSeries;
 import org.jfree.data.xy.XYIntervalSeries;
 import org.jfree.data.xy.XYIntervalSeriesCollection;
 
-import com.xceptance.common.collection.LRUHashMap;
 import com.xceptance.common.lang.StringHasher;
 import com.xceptance.xlt.api.engine.Data;
 import com.xceptance.xlt.api.engine.RequestData;
@@ -290,7 +289,7 @@ public class RequestDataProcessor extends BasicTimerDataProcessor
         // special request processing
         final RequestData reqData = (RequestData) data;
 
-        final int runTime = (int) reqData.getRunTime();
+        final int runTime = reqData.getRunTime();
 
         if (runTimeHistogramValueSet != null)
         {
