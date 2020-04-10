@@ -20,8 +20,8 @@ import com.xceptance.common.util.ParameterCheckUtils;
 import com.xceptance.xlt.report.util.lucene.OpenBitSet;
 
 /**
- * A {@link LowPrecisionIntValueSet} stores any number of distinct integer values out of [0..{@link Integer#MAX_VALUE}]
- * in a memory-efficient way, however, at the cost of losing precision. This means that values added to this set may
+ * A {@link IntLowPrecisionValueSet} stores any number of distinct integer values out of [0..{@link Integer#MAX_VALUE}]
+ * in a memory-efficient way, however, at the cost of loosing precision. This means that values added to this set may
  * not necessarily be returned precisely as they were, but rough approximations of them only. This data structure is
  * especially useful for charts, where we often have to deal with many different values. Since the chart resolution is
  * rather low, we can live with the approximated values and save a lot of memory at the same time.
@@ -29,9 +29,9 @@ import com.xceptance.xlt.report.util.lucene.OpenBitSet;
  * The set maintains a fixed number N of buckets to store the values, and the initial value range is [0..N-1]. If a
  * value does not fit into the current value range, the range is scaled until the value fits in. Scaling means the value
  * range is doubled causing two adjacent buckets to be merged into one. Since the underlying storage is always fixed,
- * scaling has the negative side effect of losing precision.
+ * scaling has the negative side effect of loosing precision.
  */
-public class LowPrecisionIntValueSet
+public class IntLowPrecisionValueSet
 {
     /**
      * The default number of buckets.
@@ -39,7 +39,7 @@ public class LowPrecisionIntValueSet
     private static int DEFAULT_BUCKET_COUNT = 128;
 
     /**
-     * Sets the default number of buckets for new {@link LowPrecisionIntValueSet} objects.
+     * Sets the default number of buckets for new {@link IntLowPrecisionValueSet} objects.
      * 
      * @param buckets
      *            the number of buckets
@@ -67,21 +67,21 @@ public class LowPrecisionIntValueSet
     private int scale;
 
     /**
-     * Creates a {@link LowPrecisionIntValueSet} object with {@value LowPrecisionIntValueSet#DEFAULT_BUCKET_COUNT}
+     * Creates a {@link IntLowPrecisionValueSet} object with {@value IntLowPrecisionValueSet#DEFAULT_BUCKET_COUNT}
      * buckets.
      */
-    public LowPrecisionIntValueSet()
+    public IntLowPrecisionValueSet()
     {
         this(DEFAULT_BUCKET_COUNT);
     }
 
     /**
-     * Creates a {@link LowPrecisionIntValueSet} object with the given number of buckets.
+     * Creates a {@link IntLowPrecisionValueSet} object with the given number of buckets.
      * 
      * @param buckets
      *            the number of buckets
      */
-    public LowPrecisionIntValueSet(final int buckets)
+    public IntLowPrecisionValueSet(final int buckets)
     {
         this.buckets = buckets;
 
@@ -136,7 +136,7 @@ public class LowPrecisionIntValueSet
         {
             return false;
         }
-        final LowPrecisionIntValueSet other = (LowPrecisionIntValueSet) obj;
+        final IntLowPrecisionValueSet other = (IntLowPrecisionValueSet) obj;
         if (bitSet == null)
         {
             if (other.bitSet != null)
@@ -204,14 +204,14 @@ public class LowPrecisionIntValueSet
      * @param other
      *            the other set
      */
-    public void merge(final LowPrecisionIntValueSet other)
+    public void merge(final IntLowPrecisionValueSet other)
     {
         // TODO: check for same bucket count
 
         // first make both bit sets the same scale
         if (scale != other.scale)
         {
-            final LowPrecisionIntValueSet toBeScaled;
+            final IntLowPrecisionValueSet toBeScaled;
             final int targetScale;
 
             if (scale < other.scale)
