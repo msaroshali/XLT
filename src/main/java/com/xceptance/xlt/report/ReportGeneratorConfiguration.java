@@ -18,7 +18,6 @@ package com.xceptance.xlt.report;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -163,6 +162,7 @@ public class ReportGeneratorConfiguration extends AbstractConfiguration implemen
     private static final String PROP_REQUEST_MERGE_RULES_PREFIX = PROP_PREFIX + "requestMergeRules.";
 
     // Special settings for profiling and debugging
+    private static final String PROP_POSTPROCRESSING_THREAD_COUNT = PROP_PREFIX + "postprocessing.threads";
     private static final String PROP_PARSER_THREAD_COUNT = PROP_PREFIX + "parser.threads";
     private static final String PROP_READER_THREAD_COUNT = PROP_PREFIX + "reader.threads";
     private static final String PROP_STATISTICS_THREAD_COUNT = PROP_PREFIX + "statistics.threads";
@@ -247,6 +247,7 @@ public class ReportGeneratorConfiguration extends AbstractConfiguration implemen
 
     public final int readerThreadCount;
     public final int parserThreadCount;
+    public final int postprocessingThreadCount;
     public final int statisticsThreadCount;
     public final int threadQueueBucketSize;
     public final int threadQueueLength;
@@ -419,6 +420,7 @@ public class ReportGeneratorConfiguration extends AbstractConfiguration implemen
 
         readerThreadCount = Math.max(1, getIntProperty(PROP_READER_THREAD_COUNT, Runtime.getRuntime().availableProcessors() / 2));
         parserThreadCount = Math.max(1, getIntProperty(PROP_PARSER_THREAD_COUNT, Runtime.getRuntime().availableProcessors()));
+        postprocessingThreadCount = Math.max(1, getIntProperty(PROP_POSTPROCRESSING_THREAD_COUNT, Runtime.getRuntime().availableProcessors()));
         statisticsThreadCount = Math.max(1, getIntProperty(PROP_STATISTICS_THREAD_COUNT, Runtime.getRuntime().availableProcessors()));
         threadQueueBucketSize = Math.max(1, getIntProperty(PROP_THREAD_QUEUE_SIZE, Dispatcher.DEFAULT_QUEUE_CHUNK_SIZE));
         threadQueueLength = Math.max(1, getIntProperty(PROP_THREAD_QUEUE_LENGTH, Dispatcher.DEFAULT_QUEUE_LENGTH));
