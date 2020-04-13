@@ -153,9 +153,7 @@ public class Dispatcher
      */
     public DataChunk retrieveReadData() throws InterruptedException
     {
-        final DataChunk c = readDataQueue.take();
-
-        return c;
+        return readDataQueue.take();
     }
 
     /**
@@ -166,7 +164,7 @@ public class Dispatcher
      */
     public void addPostprocessedData(final SimpleArrayList<Data> records) throws InterruptedException
     {
-        statisticsProcessor.run(records);
+        statisticsProcessor.process(records);
         finishedProcessing();
     }
     

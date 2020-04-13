@@ -129,7 +129,7 @@ class DataParserThread implements Runnable
                     {
                         if (data instanceof RequestData)
                         {
-                            RequestData result = postprocess((RequestData) data, requestProcessingRules, removeIndexes);
+                            final RequestData result = postprocess((RequestData) data, requestProcessingRules, removeIndexes);
                             if (result != null) 
                             {
                                 dataRecordChunk.add(result);
