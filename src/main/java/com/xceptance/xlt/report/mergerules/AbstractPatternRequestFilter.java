@@ -15,15 +15,13 @@
  */
 package com.xceptance.xlt.report.mergerules;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.xceptance.common.collection.LRUCache;
 import com.xceptance.common.collection.LRUHashMap;
 import com.xceptance.common.lang.ThrowableUtils;
 import com.xceptance.common.util.RegExUtils;
@@ -37,19 +35,24 @@ public abstract class AbstractPatternRequestFilter extends AbstractRequestFilter
     /**
      * Cache the expensive stuff but with little sync overhead
      */
-    private ThreadLocal<Map<String, Object>> cache = new ThreadLocal<Map<String, Object>>() 
+    private ThreadLocal<LRUHashMap<String, Matcher>> cache = new ThreadLocal<LRUHashMap<String, Matcher>>() 
     {
         @Override 
-        protected Map<String, Object> initialValue() 
+        protected LRUHashMap<String, Matcher> initialValue() 
         {
-            return new LRUHashMap<>(1001);
+            return new LRUHashMap<>(cacheSize);
         }
     };
 
     /**
+     * The size of the cache, because different filters have different demands
+     */
+    private final int cacheSize;
+    
+    /**
      * Just a place holder for a NULL
      */
-    private static final Object NULL = new Object();
+    private static final Matcher NULL = Pattern.compile(".*").matcher("null");
 
     /**
      * The pattern this filter uses.
@@ -71,7 +74,8 @@ public abstract class AbstractPatternRequestFilter extends AbstractRequestFilter
      */
     public AbstractPatternRequestFilter(final String typeCode, final String regex)
     {
-        this(typeCode, regex, false);
+        // default cache
+        this(typeCode, regex, false, 1000);
     }
 
     /**
@@ -84,7 +88,7 @@ public abstract class AbstractPatternRequestFilter extends AbstractRequestFilter
      * @param exclude
      *            whether or not this is an exclusion rule
      */
-    public AbstractPatternRequestFilter(final String typeCode, final String regex, final boolean exclude)
+    public AbstractPatternRequestFilter(final String typeCode, final String regex, final boolean exclude, final int cacheSize)
     {
         super(typeCode);
 
@@ -96,7 +100,8 @@ public abstract class AbstractPatternRequestFilter extends AbstractRequestFilter
         {
             pattern = RegExUtils.getPattern(regex, 0);
         }
-        isExclude = exclude;
+        this.isExclude = exclude;
+        this.cacheSize = cacheSize;
     }
 
     /**
@@ -122,18 +127,18 @@ public abstract class AbstractPatternRequestFilter extends AbstractRequestFilter
         final String text = getText(requestData);
 
         // get us a local reference to the cache
-        final Map<String, Object> cache = this.cache.get();
+        final LRUHashMap<String, Matcher> cache = this.cache.get();
 
-        Object result = cache.get(text);
+        Matcher result = cache.get(text);
         if (result == null)
         {
             // not found, produce and cache
-            final Matcher matcher = pattern.matcher(getText(requestData));
+            final Matcher matcher = pattern.matcher(text);
 
             result = (matcher.find() ^ isExclude) ? matcher : NULL;
             cache.put(text, result);
         }
-
+        
         // ok, we got one, just see if this is NULL or a match
         if (result == NULL)
         {
@@ -141,7 +146,9 @@ public abstract class AbstractPatternRequestFilter extends AbstractRequestFilter
         }
         else
         {
-            return ((Matcher) result).toMatchResult();
+            // the strange trick with a static stand in for a Matcher
+            // helps us to safe a cast here and earlier
+            return result.toMatchResult();
         }
     }
 
