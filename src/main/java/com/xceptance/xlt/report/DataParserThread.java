@@ -15,13 +15,8 @@
  */
 package com.xceptance.xlt.report;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -77,10 +72,7 @@ class DataParserThread implements Runnable
      * The general config of the report generator
      */
     private final ReportGeneratorConfiguration config;
-    
-    final static ExecutorService pool = Executors.newWorkStealingPool(8);
 
-    
     /**
      * Constructor.
      *
@@ -115,7 +107,7 @@ class DataParserThread implements Runnable
     {
         final List<RequestProcessingRule> requestProcessingRules = config.getRequestProcessingRules();
         final boolean removeIndexes = config.getRemoveIndexesFromRequestNames();
-        
+
         while (true)
         {
             try
@@ -126,8 +118,7 @@ class DataParserThread implements Runnable
 
                 // parse the chunk of lines and preprocess the results
                 final SimpleArrayList<Data> dataRecordChunk = new SimpleArrayList<>(lines.size());
-                final List<Future<RequestData>> tasks = new ArrayList<>();
-                
+
                 int lineNumber = lineChunk.getBaseLineNumber();
 
                 final int size = lines.size();
@@ -138,15 +129,11 @@ class DataParserThread implements Runnable
                     {
                         if (data instanceof RequestData)
                         {
-                            // send it into parallel processing
-                            Future<RequestData> result = pool.submit(() -> postprocess((RequestData) data, 
-                                                                                       requestProcessingRules, 
-                                                                                       removeIndexes));
-                            tasks.add(result);
-                            
-//                            // send it into parallel processing
-//                            RequestData result = postprocess((RequestData) data, requestProcessingRules, removeIndexes);
-//                            if (result != null) dataRecordChunk.add(result);
+                            RequestData result = postprocess((RequestData) data, requestProcessingRules, removeIndexes);
+                            if (result != null) 
+                            {
+                                dataRecordChunk.add(result);
+                            }
                         }
                         else
                         {
@@ -157,24 +144,6 @@ class DataParserThread implements Runnable
                     lineNumber++;
                 }
 
-                tasks.stream().map(f -> {
-                    try
-                    {
-                        return f.get();
-                    }
-                    catch (InterruptedException e)
-                    {
-                        LOG.error("Postprocessing was interrupted");
-                    }
-                    catch (ExecutionException e)
-                    {
-                        LOG.error("Postprocessing failed", e.getCause());
-                    }
-                    
-                    return null;
-                }).filter(d -> d != null).forEach(d -> dataRecordChunk.add(d));
-
-                
                 // deliver the chunk of parsed data records
                 dispatcher.addPostprocessedData(dataRecordChunk);
             }
@@ -248,7 +217,7 @@ class DataParserThread implements Runnable
             return null;
         }
     }
-    
+
     /**
      * Processes a request according to the configured request processing rules. Currently, this means renaming or
      * discarding requests.
@@ -260,8 +229,8 @@ class DataParserThread implements Runnable
      * @return the processed request data record, or <code>null</code> if the data record is to be discarded
      */
     private RequestData postprocess(RequestData requestData, 
-                                           final List<RequestProcessingRule> requestProcessingRules, 
-                                           boolean removeIndexesFromRequestNames)
+                                    final List<RequestProcessingRule> requestProcessingRules, 
+                                    boolean removeIndexesFromRequestNames)
     {
         // fix up the name first (Product.1.2 -> Product) if so configured
         if (removeIndexesFromRequestNames)
