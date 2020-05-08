@@ -17,6 +17,8 @@ package com.xceptance.xlt.api.engine;
 
 import java.util.List;
 
+import com.xceptance.common.util.XltCharBuffer;
+
 /**
  * <p>
  * The {@link EventData} class is used to record information about arbitrary "events" that may occur during a test run.
@@ -47,7 +49,7 @@ public class EventData extends AbstractData
     /**
      * The type code ("E").
      */
-    private static final String TYPE_CODE = "E";
+    private static final char TYPE_CODE = 'E';
 
     /**
      * The message describing the details of this event.
@@ -138,13 +140,13 @@ public class EventData extends AbstractData
      * {@inheritDoc}
      */
     @Override
-    protected void parseValues(final List<String> values)
+    protected void parseValues(final List<XltCharBuffer> values)
     {
         super.parseValues(values);
 
         // read and check the values
-        testCaseName = values.get(3);
-        message = values.get(4);
+        testCaseName = values.get(3).toString();
+        message = values.get(4).toString();
     }
 
     /**

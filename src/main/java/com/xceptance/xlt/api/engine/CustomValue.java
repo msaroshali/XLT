@@ -17,6 +17,8 @@ package com.xceptance.xlt.api.engine;
 
 import java.util.List;
 
+import com.xceptance.common.util.XltCharBuffer;
+
 /**
  * The {@link CustomValue} can store a single 'double' value.
  * 
@@ -27,7 +29,7 @@ public class CustomValue extends AbstractData
     /**
      * The type code ("V").
      */
-    private static final String TYPE_CODE = "V";
+    private static final char TYPE_CODE = 'V';
 
     /**
      * The value.
@@ -100,9 +102,9 @@ public class CustomValue extends AbstractData
      * {@inheritDoc}
      */
     @Override
-    protected void parseValues(final List<String> values)
+    protected void parseValues(final List<XltCharBuffer> values)
     {
         super.parseValues(values);
-        value = Double.parseDouble(values.get(3));
+        value = Double.parseDouble(values.get(3).toString());
     }
 }
