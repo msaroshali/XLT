@@ -220,8 +220,9 @@ class DataReaderThread implements Runnable
                 if (linesRead == chunkSize)
                 {
                     // the chunk is full -> deliver it
-                    buildAndSubmitLineChunk(lines, baseLineNumber, file, collectActionNames, adjustTimerName);
-
+                    final DataChunk lineChunk = new DataChunk(lines, baseLineNumber, file, agentName, testCaseName, userNumber, collectActionNames, adjustTimerName, actionNames);
+                    dispatcher.addReadData(lineChunk);
+                    
                     // start a new chunk
                     lines = new SimpleArrayList<>(chunkSize + 1);
                     baseLineNumber += linesRead;
@@ -235,7 +236,9 @@ class DataReaderThread implements Runnable
             // deliver any remaining lines
             if (linesRead > 0)
             {
-                buildAndSubmitLineChunk(lines, baseLineNumber, file, collectActionNames, adjustTimerName);
+                final DataChunk lineChunk = new DataChunk(lines, baseLineNumber, file, agentName, testCaseName, userNumber, collectActionNames, adjustTimerName, actionNames);
+                dispatcher.addReadData(lineChunk);
+                
                 totalLineCounter.addAndGet(linesRead);
             }
         }
@@ -246,11 +249,11 @@ class DataReaderThread implements Runnable
         }
     }
 
-    private void buildAndSubmitLineChunk(final List<OpenStringBuilder> lines, final int baseLineNumber, final FileObject file,
-                                         final boolean collectActionNames, final boolean adjustTimerName)
-        throws InterruptedException
-    {
-        final DataChunk lineChunk = new DataChunk(lines, baseLineNumber, file, agentName, testCaseName, userNumber, collectActionNames, adjustTimerName, actionNames);
-        dispatcher.addReadData(lineChunk);
-    }
+//    private void buildAndSubmitLineChunk(final List<OpenStringBuilder> lines, final int baseLineNumber, final FileObject file,
+//                                         final boolean collectActionNames, final boolean adjustTimerName)
+//        throws InterruptedException
+//    {
+//        final DataChunk lineChunk = new DataChunk(lines, baseLineNumber, file, agentName, testCaseName, userNumber, collectActionNames, adjustTimerName, actionNames);
+//        dispatcher.addReadData(lineChunk);
+//    }
 }
