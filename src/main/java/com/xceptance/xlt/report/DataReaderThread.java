@@ -15,13 +15,13 @@
  */
 package com.xceptance.xlt.report;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -102,6 +102,7 @@ class DataReaderThread implements Runnable
         this.agentName = agentName;
         this.testCaseName = testCaseName;
         this.userNumber = userNumber;
+        
         this.totalLineCounter = totalLineCounter;
         this.dispatcher = dispatcher;
     }
@@ -200,10 +201,13 @@ class DataReaderThread implements Runnable
         // VFS has not performance impact, hence this test code can stay here for later if needed, but might
         // not turn into a feature
         //try (final MyBufferedReader reader = new MyBufferedReader(new FileReader(file.toString().replaceFirst("^file://", ""))))
-        //try (final MyBufferedReader reader = new MyBufferedReader(new InputStreamReader(Files.newInputStream(Paths.get(new URI(file.toString()))))))
+//        try (final MyBufferedReader reader = new MyBufferedReader(new InputStreamReader(Files.newInputStream(Paths.get(new URI(file.toString()))))))
         
-         try (final MyBufferedReader reader = new MyBufferedReader(new InputStreamReader(new GZIPInputStream(file.getContent().getInputStream()), XltConstants.UTF8_ENCODING)))
-//        try (final MyBufferedReader reader = new MyBufferedReader(new InputStreamReader(file.getContent().getInputStream(), XltConstants.UTF8_ENCODING)))
+//         try (final MyBufferedReader reader = new MyBufferedReader(new InputStreamReader(new GZIPInputStream(file.getContent().getInputStream()), XltConstants.UTF8_ENCODING)))
+        try (final MyBufferedReader reader = new MyBufferedReader(
+                                                                  new InputStreamReader(
+                                                                      new BufferedInputStream(file.getContent().getInputStream()), 
+                                                                      XltConstants.UTF8_ENCODING)))
         {
             List<OpenStringBuilder> lines = new SimpleArrayList<>(chunkSize + 1);
             int baseLineNumber = 1;  // let line numbering start at 1
@@ -248,12 +252,4 @@ class DataReaderThread implements Runnable
             LOG.error(msg, ex);
         }
     }
-
-//    private void buildAndSubmitLineChunk(final List<OpenStringBuilder> lines, final int baseLineNumber, final FileObject file,
-//                                         final boolean collectActionNames, final boolean adjustTimerName)
-//        throws InterruptedException
-//    {
-//        final DataChunk lineChunk = new DataChunk(lines, baseLineNumber, file, agentName, testCaseName, userNumber, collectActionNames, adjustTimerName, actionNames);
-//        dispatcher.addReadData(lineChunk);
-//    }
 }
