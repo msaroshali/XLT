@@ -59,6 +59,9 @@ public class RequestData extends TimerData
      * The value to show if the host could not be determined from a URL.
      */
     public static final String UNKNOWN_HOST = "(unknown)";
+    {
+        UNKNOWN_HOST.hashCode(); // for caching the hashcode
+    }
     
     /**
      * The size of the response message in bytes.
@@ -573,7 +576,9 @@ public class RequestData extends TimerData
     
     /**
      * Sets the request's URL. Uses a char buffer for efficiency. 
-     * This is for decoding.
+     * This is for decoding. We do it here because it is more efficient
+     * because the data is hotter and we have more cpu available
+     * than later in the providers.
      * 
      * @param url
      *            the URL
@@ -592,6 +597,7 @@ public class RequestData extends TimerData
         else
         {   
             host = hostName;
+            host.hashCode();
         }
         
         this.url = _url;
@@ -710,6 +716,7 @@ public class RequestData extends TimerData
         {
             setUrl(values.get(8));
             contentType = values.get(9).toString();
+            contentType.hashCode(); // do that when the cache is hot
 
             setConnectTime(ParseNumbers.parseInt(values.get(10)));
             setSendTime(ParseNumbers.parseInt(values.get(11)));
