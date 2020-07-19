@@ -329,7 +329,7 @@ class DataParserThread implements Runnable
             data = new SimpleArrayList<>(size);
         }
 
-        public List<Data> getData()
+        public SimpleArrayList<Data> getData()
         {
             return data;
         }
