@@ -19,11 +19,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.xceptance.xlt.api.engine.Data;
 import com.xceptance.xlt.api.engine.RequestData;
 import com.xceptance.xlt.api.report.AbstractReportProvider;
+import com.xceptance.xlt.engine.util.FastString;
 
 /**
  * Provides basic content type statistics.
@@ -33,7 +32,7 @@ public class ContentTypesReportProvider extends AbstractReportProvider
     /**
      * A mapping from content types to their corresponding {@link ContentTypeReport} objects.
      */
-    private final Map<String, ContentTypeReport> contentTypeReports = new HashMap<String, ContentTypeReport>();
+    private final Map<FastString, ContentTypeReport> contentTypeReports = new HashMap<>(11);
 
     /**
      * {@inheritDoc}
@@ -58,7 +57,7 @@ public class ContentTypesReportProvider extends AbstractReportProvider
         {
             final RequestData reqStats = (RequestData) stat;
 
-            final String contentType = reqStats.getContentType();
+            final FastString contentType = reqStats.getContentType();
             
             // the content type is never null, it might be just "" and if this is " " or similar
             // we don't care and keep the speed, (none is set where it is produced)
@@ -71,7 +70,7 @@ public class ContentTypesReportProvider extends AbstractReportProvider
             if (contentTypeReport == null)
             {
                 contentTypeReport = new ContentTypeReport();
-                contentTypeReport.contentType = contentType;
+                contentTypeReport.contentType = contentType.toString();
 
                 contentTypeReports.put(contentType, contentTypeReport);
             }
