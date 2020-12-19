@@ -44,7 +44,7 @@ public class EventDataTest extends AbstractDataTest
     protected final static String MESSAGE = "the Message!";
 
     /** Type code of data records. */
-    protected final static String TYPE_CODE = new EventData().getTypeCode();
+    protected final static char TYPE_CODE = new EventData().getTypeCode();
 
     /** Common CSV representation (equal to {@link AbstractData#toCSV()}). */
     protected final static String COMMON_CSV = getCommonCSV();

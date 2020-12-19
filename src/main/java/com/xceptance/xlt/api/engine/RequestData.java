@@ -59,7 +59,7 @@ public class RequestData extends TimerData
     /**
      * The value to show if the host could not be determined from a URL.
      */
-    public static FastString UNKNOWN_HOST = new FastString("(unknown)", "(unknown)".hashCode());
+    public final static FastString UNKNOWN_HOST = new FastString("(unknown)", "(unknown)".hashCode());
     
     /**
      * The size of the response message in bytes.

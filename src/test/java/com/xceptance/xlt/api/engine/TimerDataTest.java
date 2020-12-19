@@ -37,7 +37,7 @@ public class TimerDataTest extends AbstractDataTest
     /**
      * The type code to use for creating new instances of class TimerData.
      */
-    private static final String TYPE_CODE = "TS";
+    private static final char TYPE_CODE = 'X';
 
     /**
      * Runtime of data record.

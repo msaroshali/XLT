@@ -59,6 +59,22 @@ public interface Data
     public void fromCSV(final OpenStringBuilder s);
 
     /**
+     * Recreates the state of this object from a list of values separated by the DELIMITER constant.
+     * This method is default to keep the API compatible. Internal processing should use the faster
+     * version with a reusable OpenStringBuilder.
+     * 
+     * @param s
+     *            the char data to parse from
+     *            
+     * @deprecated since XLT 6.0. This
+     */
+    @Deprecated
+    public default void fromCSV(final String s)
+    {
+        fromCSV(new OpenStringBuilder(s));
+    }
+    
+    /**
      * Returns the name of the agent that produced this data record. Only used during report generation or analysis.
      * 
      * @return the agent's name

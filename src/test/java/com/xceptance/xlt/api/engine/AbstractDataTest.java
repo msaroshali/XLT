@@ -15,14 +15,19 @@
  */
 package com.xceptance.xlt.api.engine;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.xceptance.common.util.CsvUtils;
+import com.xceptance.common.util.XltCharBuffer;
 import com.xceptance.xlt.AbstractXLTTestCase;
 import com.xceptance.xlt.TestWrapper;
+import com.xceptance.xlt.api.util.XltCharBufferUtil;
 
 /**
  * Test the implementation of {@link AbstractData}.
@@ -34,7 +39,7 @@ public class AbstractDataTest extends AbstractXLTTestCase
     /**
      * Type code to use for creating new instances of class AbstractData.
      */
-    private static final String TYPE_CODE = "TS";
+    private static final char TYPE_CODE = 'X';
 
     /**
      * AbstractData test instance.
@@ -86,7 +91,7 @@ public class AbstractDataTest extends AbstractXLTTestCase
     @Test(expected = IllegalArgumentException.class)
     public void csvMissesNameAndTime()
     {
-        instance.fromCSV(instance.getTypeCode());
+        instance.fromCSV(String.valueOf(instance.getTypeCode()));
     }
 
     /**
@@ -165,7 +170,8 @@ public class AbstractDataTest extends AbstractXLTTestCase
                 {
                     array[i] = "bla";
                 }
-                td.parseValue(array);
+                
+                td.parseValue(XltCharBufferUtil.toList(array));
             }
         };
     }
@@ -183,7 +189,7 @@ public class AbstractDataTest extends AbstractXLTTestCase
 
         instance.fromCSV(CsvUtils.encode(new String[]
             {
-                instance.getTypeCode(), name, Long.toString(time)
+                String.valueOf(instance.getTypeCode()), name, Long.toString(time)
             }));
         Assert.assertEquals(name, instance.getName());
     }
@@ -214,11 +220,9 @@ public class AbstractDataTest extends AbstractXLTTestCase
     {
         // read it in CSV representation and parse it
 
-        final String typeCode = instance.getTypeCode();
-        instance.fromCSV(StringUtils.join(new Object[]
-            {
-                typeCode, name, time
-            }, Data.DELIMITER));
+        final String typeCode = String.valueOf(instance.getTypeCode());
+        final String s = StringUtils.join(typeCode, name, time, Data.DELIMITER);
+        instance.fromCSV(s);
 
         // validate
         Assert.assertEquals(typeCode, instance.getTypeCode());
@@ -314,10 +318,10 @@ public class AbstractDataTest extends AbstractXLTTestCase
     {
         private TestData()
         {
-            super("0");
+            super('0');
         }
 
-        protected void parseValue(final String[] values)
+        protected void parseValue(final List<XltCharBuffer> values)
         {
             super.parseValues(values);
         }

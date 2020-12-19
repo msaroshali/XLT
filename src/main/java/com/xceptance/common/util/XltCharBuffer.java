@@ -1,9 +1,9 @@
 package com.xceptance.common.util;
 
 /**
- * This class does not implement the CharBuffer of the JDK, but uses the idea of a shares
+ * This class does not implement the CharBuffer of the JDK, but uses the idea of a shared
  * character array with views. This is also a very unsafe implementation with as little
- * as possible bound checks to achieve the maximum speed possible.
+ * as possible bound checks to achieve the maximum speed possible. Use carefully!!!!
  * 
  * @author rschwietzke
  *
@@ -66,6 +66,16 @@ public class XltCharBuffer
     public static XltCharBuffer empty()
     {
         return EMPTY;
+    }
+    
+    /**
+     * Converts a string into an XltCharBufferUtil
+     * @param s the string to convert
+     * @return the converted instance
+     */
+    public static XltCharBuffer fromString(final String s)
+    {
+        return new XltCharBuffer(s.toCharArray());
     }
     
     @Override
