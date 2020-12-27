@@ -312,7 +312,7 @@ public class MyBufferedReader extends Reader {
      *
      * @exception  IOException  If an I/O error occurs
      */
-    OpenStringBuilder readLine(boolean ignoreLF) throws IOException {
+    public OpenStringBuilder readLine(boolean ignoreLF) throws IOException {
         OpenStringBuilder s = null;
         int startChar;
 
