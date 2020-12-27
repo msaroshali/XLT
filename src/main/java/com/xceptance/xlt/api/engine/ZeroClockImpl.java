@@ -1,23 +1,22 @@
 package com.xceptance.xlt.api.engine;
 
 /**
- * <p>
  * This clock is meant to aid report creation be lowering the overhead. It will always
  * tell you 0 as time.
  */
-public class ZeroClock extends GlobalClock
+public class ZeroClockImpl extends GlobalClock
 {
     /**
      * The one and only instance.
      */
-    private static final ZeroClock singleton = new ZeroClock();
+    private static final ZeroClockImpl singleton = new ZeroClockImpl();
 
     /**
      * Returns the GlobalClock singleton.
      * 
      * @return the global clock
      */
-    public static ZeroClock getInstance()
+    public static ZeroClockImpl getInstance()
     {
         return singleton;
     }
