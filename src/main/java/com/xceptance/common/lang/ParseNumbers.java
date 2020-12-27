@@ -27,7 +27,7 @@ public final class ParseNumbers
      * @return the converted string as int
      * @throws java.lang.NumberFormatException
      */
-    public static long parseLong(final char[] s)
+    public static long parseLong(final XltCharBuffer s)
     {
         // no string
         if (s == null)
@@ -36,7 +36,7 @@ public final class ParseNumbers
         }
 
         // determine length
-        final int length = s.length;
+        final int length = s.length();
         
         if (length == 0)
         {
@@ -44,23 +44,23 @@ public final class ParseNumbers
         }
         
         // that is safe, we already know that we are > 0
-        final int digit = s[0];
+        final int digit = s.get(0);
         
         // turn the compare around to allow the compiler and cpu
         // to run the next code most of the time
         if (digit < '0' || digit > '9')
         {
-            return Long.parseLong(String.valueOf(s));
+            return Long.parseLong(s.toString());
         }
         
         long value = digit - DIGITOFFSET;
         
         for (int i = 1; i < length; i++)
         {
-            final int d = s[i];
+            final int d = s.get(i);
             if (d < '0' || d > '9')
             {
-                return Long.parseLong(String.valueOf(s));
+                return Long.parseLong(s.toString());
             }
 
             value = ((value << 3) + (value << 1));
@@ -103,7 +103,7 @@ public final class ParseNumbers
         // to run the next code most of the time
         if (digit < '0' || digit > '9')
         {
-            return Integer.parseInt(String.valueOf(s));
+            return Integer.parseInt(s.toString());
         }
         
         int value = digit - DIGITOFFSET;
@@ -113,7 +113,7 @@ public final class ParseNumbers
             final int d = s.get(i);
             if (d < '0' || d > '9')
             {
-                return Integer.parseInt(String.valueOf(s));
+                return Integer.parseInt(s.toString());
             }
 
             value = ((value << 3) + (value << 1));
@@ -181,8 +181,6 @@ public final class ParseNumbers
         }
 
         // adjust the decimal places
-        double result = value * multipliers[length - decimalPos];
-        
-        return result;
+        return value * multipliers[length - decimalPos];
     }
 }

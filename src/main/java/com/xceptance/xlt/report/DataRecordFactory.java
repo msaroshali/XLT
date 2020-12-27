@@ -19,6 +19,7 @@ import java.lang.reflect.Constructor;
 import java.util.Map;
 
 import com.xceptance.common.lang.OpenStringBuilder;
+import com.xceptance.common.util.XltCharBuffer;
 import com.xceptance.xlt.api.engine.Data;
 
 /**
@@ -94,13 +95,13 @@ public class DataRecordFactory
      * @return the parsed csv line as fitting data object
      * @throws Exception
      */
-    public Data createStatistics(final OpenStringBuilder s) throws Exception
+    public Data createStatistics(final XltCharBuffer src) throws Exception
     {
         // create the statistics object
-        final Constructor<? extends Data> c = ctrs[s.charAt(0) - offset];
+        final Constructor<? extends Data> c = ctrs[src.get(0) - offset];
         final Data data = c.newInstance();
 
-        data.fromCSV(s);
+        data.fromCSV(src);
 
         return data;
     }

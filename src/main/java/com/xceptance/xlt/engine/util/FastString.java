@@ -1,5 +1,7 @@
 package com.xceptance.xlt.engine.util;
 
+import java.util.Arrays;
+
 /**
  * This is a wrapper around string to cache the hashcode and 
  * change the equals comparison. This is a perfect candidate for Valhalla's
@@ -12,16 +14,20 @@ public class FastString
 {
     private final int hashCode;
     private final String data;
+    private final char[] charArray;
     
     public FastString(final String data, int hashCode)
     {
         this.data = data;
         this.hashCode = hashCode;
+        this.charArray = data.toCharArray();
     }
+    
     public FastString(final String data)
     {
         this.data = data;
         this.hashCode = data.hashCode();
+        this.charArray = data.toCharArray();
     }
     
     @Override
@@ -53,24 +59,8 @@ public class FastString
         {
             return false;
         }
-        if (data.length() == other.data.length())
-        {
-            // compare content, don't use string, because we don't know if it
-            // will pull a hashcode
-            int n = data.length();
-            int i = 0;
-            while (n-- != 0) 
-            {
-                if (data.charAt(i) != other.data.charAt(i))
-                {
-                    return false;
-                }
-                i++;
-            }
-
-        }
         
-        return true;
+        return Arrays.equals(charArray, other.charArray);
     }
     
     

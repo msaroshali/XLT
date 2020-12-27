@@ -16,6 +16,7 @@
 package com.xceptance.xlt.api.engine;
 
 import com.xceptance.common.lang.OpenStringBuilder;
+import com.xceptance.common.util.XltCharBuffer;
 
 /**
  * <p>
@@ -54,9 +55,9 @@ public interface Data
      * Recreates the state of this object from a list of values separated by the DELIMITER constant.
      * 
      * @param s
-     *            the char data to parse from
+     *            the special char array to parse within
      */
-    public void fromCSV(final OpenStringBuilder s);
+    public void fromCSV(final XltCharBuffer s);
 
     /**
      * Recreates the state of this object from a list of values separated by the DELIMITER constant.
@@ -71,7 +72,7 @@ public interface Data
     @Deprecated
     public default void fromCSV(final String s)
     {
-        fromCSV(new OpenStringBuilder(s));
+        fromCSV(XltCharBuffer.valueOf(s));
     }
     
     /**

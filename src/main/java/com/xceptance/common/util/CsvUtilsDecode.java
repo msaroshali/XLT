@@ -47,7 +47,7 @@ public final class CsvUtilsDecode
      */
     public static List<XltCharBuffer> parse(final String s)
     {
-        return parse(new OpenStringBuilder(s), COMMA);
+        return parse(XltCharBuffer.valueOf(s), COMMA);
     }
 
     private static final int NONE = 0;
@@ -57,6 +57,7 @@ public final class CsvUtilsDecode
     private static final int LAST_WAS_SEPARATOR = 8;
     private static final int JUST_LEFT_QUOTES = 16;    
     private static final int COPY_REST = 32;    
+    
     /**
      * Encodes the given fields to a CSV-encoded data record using the given field separator.
      * 
@@ -67,10 +68,9 @@ public final class CsvUtilsDecode
      * @return the CSV-encoded data record
      * @throws ParseException 
      */
-    public static List<XltCharBuffer> parse(final OpenStringBuilder _src, final char fieldSeparator)
+    public static List<XltCharBuffer> parse(final XltCharBuffer src, final char fieldSeparator)
     {
         final SimpleArrayList<XltCharBuffer> result = new SimpleArrayList<>(30);
-        final XltCharBuffer src = new XltCharBuffer(_src.getCharArray(), 0, _src.length());
         
         final int size = src.length();
 

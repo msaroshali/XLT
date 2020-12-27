@@ -26,6 +26,7 @@ import org.apache.commons.vfs2.FileObject;
 
 import com.xceptance.common.lang.OpenStringBuilder;
 import com.xceptance.common.util.SimpleArrayList;
+import com.xceptance.common.util.XltCharBuffer;
 import com.xceptance.xlt.api.engine.ActionData;
 import com.xceptance.xlt.api.engine.Data;
 import com.xceptance.xlt.api.engine.PageLoadTimingData;
@@ -115,55 +116,60 @@ class DataParserThread implements Runnable
             try
             {
                 // get a chunk of lines
-                final DataChunk lineChunk = dispatcher.retrieveReadData();
-                final List<OpenStringBuilder> lines = lineChunk.getLines();
+                final List<DataChunk> chunks = dispatcher.retrieveReadData();
 
-                final String agentName = lineChunk.getAgentName();
-                final String testCaseName = lineChunk.getTestCaseName();
-                final String userNumber = lineChunk.getUserNumber(); 
-                final boolean collectActionNames = lineChunk.getCollectActionNames();
-                final boolean adjustTimerName = lineChunk.getAdjustTimerNames();
-                final FileObject file = lineChunk.getFile();
-
-                final long _fromTime = fromTime;
-                final long _toTime = toTime;
-
-                // parse the chunk of lines and preprocess the results
-                final PostprocessedDataContainer postProcessedData = new PostprocessedDataContainer(lines.size());
-
-                int lineNumber = lineChunk.getBaseLineNumber();
-
-                final int size = lines.size();
-                for (int i = 0; i < size; i++)
+                // we  might have gotten a lot of data, so run all of it
+                for (DataChunk lineChunk : chunks)
                 {
-                    Data data = parseLine(lines.get(i), lineNumber, file);
-                    if (data != null)
-                    {
-                        if (filterByTime(data, _fromTime, _toTime) == false)
-                        {
-                            data = applyDataAdjustments(data, agentName, testCaseName, userNumber,
-                                                        collectActionNames, lineChunk, adjustTimerName);
+                    final List<XltCharBuffer> lines = lineChunk.getLines();
 
-                            if (data instanceof RequestData)
+                    final String agentName = lineChunk.getAgentName();
+                    final String testCaseName = lineChunk.getTestCaseName();
+                    final String userNumber = lineChunk.getUserNumber(); 
+                    final boolean collectActionNames = lineChunk.getCollectActionNames();
+                    final boolean adjustTimerName = lineChunk.getAdjustTimerNames();
+                    final FileObject file = lineChunk.getFile();
+
+                    final long _fromTime = fromTime;
+                    final long _toTime = toTime;
+
+                    // parse the chunk of lines and preprocess the results
+                    final PostprocessedDataContainer postProcessedData = new PostprocessedDataContainer(lines.size());
+
+                    int lineNumber = lineChunk.getBaseLineNumber();
+
+                    final int size = lines.size();
+                    for (int i = 0; i < size; i++)
+                    {
+                        Data data = parseLine(lines.get(i), lineNumber, file);
+                        if (data != null)
+                        {
+                            if (filterByTime(data, _fromTime, _toTime) == false)
                             {
-                                final RequestData result = postprocess((RequestData) data, requestProcessingRules, removeIndexes);
-                                if (result != null) 
+                                data = applyDataAdjustments(data, agentName, testCaseName, userNumber,
+                                                            collectActionNames, lineChunk, adjustTimerName);
+
+                                if (data instanceof RequestData)
                                 {
-                                    postProcessedData.add(result);
+                                    final RequestData result = postprocess((RequestData) data, requestProcessingRules, removeIndexes);
+                                    if (result != null) 
+                                    {
+                                        postProcessedData.add(result);
+                                    }
+                                }
+                                else
+                                {
+                                    postProcessedData.add(data);
                                 }
                             }
-                            else
-                            {
-                                postProcessedData.add(data);
-                            }
                         }
+
+                        lineNumber++;
                     }
 
-                    lineNumber++;
+                    // deliver the chunk of parsed data records
+                    dispatcher.addPostprocessedData(postProcessedData);
                 }
-
-                // deliver the chunk of parsed data records
-                dispatcher.addPostprocessedData(postProcessedData);
             }
             catch (final InterruptedException e)
             {
@@ -183,7 +189,7 @@ class DataParserThread implements Runnable
      *              the file it came from for error reporting just in case
      * @return the parsed data record
      */
-    private Data parseLine(final OpenStringBuilder line, final int lineNumber, final FileObject file)
+    private Data parseLine(final XltCharBuffer line, final int lineNumber, final FileObject file)
     {
         try
         {
@@ -322,7 +328,7 @@ class DataParserThread implements Runnable
          * Creation time of first data record.
          */
         private long minimumTime = Long.MAX_VALUE;
-        
+
 
         PostprocessedDataContainer(final int size)
         {
@@ -341,7 +347,7 @@ class DataParserThread implements Runnable
 
             minimumTime = Math.min(minimumTime, time);
             maximumTime = Math.max(maximumTime, time);
-            
+
             data.add(d);
         }
 

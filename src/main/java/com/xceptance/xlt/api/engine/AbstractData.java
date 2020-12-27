@@ -85,7 +85,7 @@ public abstract class AbstractData implements Data
      * {@inheritDoc}
      */
     @Override
-    public final void fromCSV(final OpenStringBuilder s)
+    public final void fromCSV(final XltCharBuffer s)
     {
         final List<XltCharBuffer> fields = CsvUtilsDecode.parse(s, DELIMITER);
         parseValues(fields);
@@ -242,7 +242,7 @@ public abstract class AbstractData implements Data
             name = values.get(1).toString();
             name.hashCode(); // create it when it is still hot in the cache
             
-            time = ParseNumbers.parseLong(values.get(2).);
+            time = ParseNumbers.parseLong(values.get(2));
 
             if (time <= 0)
             {

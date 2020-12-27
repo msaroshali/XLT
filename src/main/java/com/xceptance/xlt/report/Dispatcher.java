@@ -15,6 +15,8 @@
  */
 package com.xceptance.xlt.report;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -147,9 +149,19 @@ public class Dispatcher
      *
      * @return the line chunk
      */
-    public DataChunk retrieveReadData() throws InterruptedException
+    public List<DataChunk> retrieveReadData() throws InterruptedException
     {
-        return readDataQueue.take();
+        final List<DataChunk> list = new ArrayList<>(10);
+        final int count = readDataQueue.drainTo(list, 10);
+        
+        // if we have not seen anything, we gotta wait
+        if (count == 0)
+        {
+            final DataChunk data = readDataQueue.take();
+            list.add(data);
+        }
+        
+        return list;
     }
 
     /**

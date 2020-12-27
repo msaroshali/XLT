@@ -32,6 +32,7 @@ import org.apache.commons.vfs2.FileType;
 import com.xceptance.common.io.MyBufferedReader;
 import com.xceptance.common.lang.OpenStringBuilder;
 import com.xceptance.common.util.SimpleArrayList;
+import com.xceptance.common.util.XltCharBuffer;
 import com.xceptance.xlt.common.XltConstants;
 
 /**
@@ -212,22 +213,24 @@ class DataReaderThread implements Runnable
                                                                                   new GZIPInputStream(new BufferedInputStream(file.getContent().getInputStream())) : new BufferedInputStream(file.getContent().getInputStream())
                                                                                   , XltConstants.UTF8_ENCODING)))
         {
-            List<OpenStringBuilder> lines = new SimpleArrayList<>(chunkSize + 1);
+            List<XltCharBuffer> lines = new SimpleArrayList<>(chunkSize + 1);
             int baseLineNumber = 1;  // let line numbering start at 1
             int linesRead = 0;
 
             // read the file line-by-line
             OpenStringBuilder line;
-            while ((line = reader.readLine()) != null)
+            while ((line = reader.readLine(false)) != null)
             {
                 linesRead++;
-                lines.add(line);
+                lines.add(XltCharBuffer.valueOf(line));
 
                 // have we filled the chunk?
                 if (linesRead == chunkSize)
                 {
                     // the chunk is full -> deliver it
                     final DataChunk lineChunk = new DataChunk(lines, baseLineNumber, file, agentName, testCaseName, userNumber, collectActionNames, adjustTimerName, actionNames);
+                    
+                    // deliver to dispatcher, this might block
                     dispatcher.addReadData(lineChunk);
                     
                     // start a new chunk
