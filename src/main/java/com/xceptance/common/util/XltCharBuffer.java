@@ -1,5 +1,7 @@
 package com.xceptance.common.util;
 
+import com.xceptance.common.lang.OpenStringBuilder;
+
 /**
  * This class does not implement the CharBuffer of the JDK, but uses the idea of a shared
  * character array with views. This is also a very unsafe implementation with as little
@@ -69,13 +71,23 @@ public class XltCharBuffer
     }
     
     /**
-     * Converts a string into an XltCharBufferUtil
-     * @param s the string to convert
+     * Converts a String into an XltCharBuffer
+     * @param s the String to convert
      * @return the converted instance
      */
-    public static XltCharBuffer fromString(final String s)
+    public static XltCharBuffer valueOf(final String s)
     {
         return new XltCharBuffer(s.toCharArray());
+    }
+    
+    /**
+     * Converts an OpenStringBuilder into an XltsCharBuffer
+     * @param s the OpenStringBuilder to convert
+     * @return the converted instance
+     */
+    public static XltCharBuffer valueOf(final OpenStringBuilder src)
+    {
+        return new XltCharBuffer(src.getCharArray(), 0, src.length());
     }
     
     @Override
