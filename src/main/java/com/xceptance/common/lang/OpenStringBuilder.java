@@ -28,45 +28,8 @@ import org.apache.commons.text.Builder;
 import org.apache.commons.text.matcher.StringMatcher;
 
 /**
- * Builds a string from constituent parts providing a more flexible and powerful API than StringBuffer.
- * <p>
- * The main differences from StringBuffer/StringBuilder are:
- * </p>
- * <ul>
- * <li>Not synchronized</li>
- * <li>Not final</li>
- * <li>Subclasses have direct access to character array</li>
- * <li>Additional methods
- * <ul>
- * <li>appendWithSeparators - adds an array of values, with a separator</li>
- * <li>appendPadding - adds a length padding characters</li>
- * <li>appendFixedLength - adds a fixed width field to the builder</li>
- * <li>toCharArray/getChars - simpler ways to get a range of the character array</li>
- * <li>delete - delete char or string</li>
- * <li>replace - search and replace for a char or string</li>
- * <li>leftString/rightString/midString - substring without exceptions</li>
- * <li>contains - whether the builder contains a char or string</li>
- * <li>size/clear/isEmpty - collections style API methods</li>
- * </ul>
- * </li>
- * <li>Views
- * <ul>
- * <li>asTokenizer - uses the internal buffer as the source of a StrTokenizer</li>
- * <li>asReader - uses the internal buffer as the source of a Reader</li>
- * <li>asWriter - allows a Writer to write directly to the internal buffer</li>
- * </ul>
- * </li>
- * </ul>
- * <p>
- * The aim has been to provide an API that mimics very closely what StringBuffer provides, but with additional methods.
- * It should be noted that some edge cases, with invalid indices or null input, have been altered - see individual
- * methods. The biggest of these changes is that by default, null will not output the text 'null'. This can be
- * controlled by a property, {@link #setNullText(String)}.
- * </p>
- * <p>
- * This class is called {@code TextStringBuilder} instead of {@code StringBuilder} to avoid clashing with
- * {@link java.lang.StringBuilder}.
- * </p>
+ * This is a StringBuilder with open access to the char array to avoid copy operations. This is 
+ * based on TextStringBuilder from Apache Commons.
  *
  * @since 1.3
  */
@@ -369,7 +332,7 @@ public class OpenStringBuilder implements CharSequence, Appendable, Serializable
     /**
      * Returns the underlying buffer WITHOUT copying it.
      *
-     * @return a new array that represents the contents of the builder
+     * @return the buffer of the underlying char array
      */
     public char[] getCharArray() {
         return buffer;
