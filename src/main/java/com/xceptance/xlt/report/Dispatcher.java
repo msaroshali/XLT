@@ -15,8 +15,6 @@
  */
 package com.xceptance.xlt.report;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -40,13 +38,13 @@ public class Dispatcher
     /**
      * The maximum number of lines in a chunk.
      */
-    public static final int DEFAULT_QUEUE_CHUNK_SIZE = 10000;
+    public static final int DEFAULT_QUEUE_CHUNK_SIZE = 1000;
 
     /**
      * The maximum number of lines in a chunk.
      */
     public static final int DEFAULT_QUEUE_LENGTH = 20;
-    
+
     /**
      * The number of directories that still need to be processed.
      */
@@ -56,7 +54,7 @@ public class Dispatcher
      * Total number of directories to be or already have been processed
      */
     private final SynchronizingCounter totalDirectories = new SynchronizingCounter();
-    
+
     /**
      * The number of chunks that still need to be processed.
      */
@@ -71,17 +69,17 @@ public class Dispatcher
      * Size of the chunks in the queues
      */
     public final int chunkSize;
-    
+
     /**
      * Our progress bar
      */
     private volatile ProgressBar progressBar;
-   
+
     /**
      * Where the processed data goes for final result evaluation
      */
     private final StatisticsProcessor statisticsProcessor;
-    
+
     /**
      * Creates a new {@link Dispatcher} object with the given thread limit.
      *
@@ -93,9 +91,9 @@ public class Dispatcher
     public Dispatcher(final ReportGeneratorConfiguration config, final StatisticsProcessor statisticsProcessor)
     {
         readDataQueue = new LinkedBlockingQueue<>(config.threadQueueLength);
-        
+
         chunkSize = config.threadQueueBucketSize;
-        
+
         this.statisticsProcessor = statisticsProcessor;
     }
 
@@ -103,7 +101,7 @@ public class Dispatcher
     {
         progressBar = new ProgressBar("Reading", 100, ProgressBarStyle.ASCII);
     }
-    
+
     /**
      * Count the directories to be processed up by one
      */
@@ -112,7 +110,7 @@ public class Dispatcher
         totalDirectories.increment();
         remainingDirectories.increment();
     }
-    
+
     /**
      * Indicates that a reader thread is about to begin reading. Called by a reader thread.
      */
@@ -140,10 +138,13 @@ public class Dispatcher
     public void addReadData(final DataChunk chunkOfLines) throws InterruptedException
     {
         openDataChunkCount.increment();
-   
-        readDataQueue.put(chunkOfLines);
+
+        while (readDataQueue.offer(chunkOfLines) == false)
+        {
+            Thread.yield();
+        }
     }
-    
+
     /**
      * Returns a chunk of lines for further processing. Called by a parser thread.
      *
@@ -151,6 +152,12 @@ public class Dispatcher
      */
     public DataChunk retrieveReadData() throws InterruptedException
     {
+//        DataChunk result = null;
+//        while ((result = readDataQueue.poll()) == null)
+//        {
+//            Thread.yield();
+//        }
+        
         return readDataQueue.take();
     }
 
@@ -165,7 +172,7 @@ public class Dispatcher
         statisticsProcessor.process(postprocessedData);
         finishedProcessing();
     }
-    
+
     /**
      * Indicates that a chunk has finished processing
      */
@@ -186,11 +193,11 @@ public class Dispatcher
 
         // wait for the data processor thread to finish data record chunks
         openDataChunkCount.awaitZero();
-        
+
         // stop progress
         progressBar.close();
     }
-    
+
     /**
      * Return the number of remaining directories
      * 
@@ -200,7 +207,7 @@ public class Dispatcher
     {
         return remainingDirectories.get();
     }
-    
+
     /**
      * Return the number of remaining or processed directory
      * 
