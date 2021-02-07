@@ -149,19 +149,9 @@ public class Dispatcher
      *
      * @return the line chunk
      */
-    public List<DataChunk> retrieveReadData() throws InterruptedException
+    public DataChunk retrieveReadData() throws InterruptedException
     {
-        final List<DataChunk> list = new ArrayList<>(10);
-        final int count = readDataQueue.drainTo(list, 10);
-        
-        // if we have not seen anything, we gotta wait
-        if (count == 0)
-        {
-            final DataChunk data = readDataQueue.take();
-            list.add(data);
-        }
-        
-        return list;
+        return readDataQueue.take();
     }
 
     /**
