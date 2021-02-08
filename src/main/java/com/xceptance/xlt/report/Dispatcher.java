@@ -138,11 +138,7 @@ public class Dispatcher
     public void addReadData(final DataChunk chunkOfLines) throws InterruptedException
     {
         openDataChunkCount.increment();
-
-        while (readDataQueue.offer(chunkOfLines) == false)
-        {
-            Thread.yield();
-        }
+        readDataQueue.put(chunkOfLines);
     }
 
     /**
