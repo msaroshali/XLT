@@ -17,6 +17,7 @@ package com.xceptance.xlt.report;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.xceptance.common.util.SynchronizingCounter;
 import com.xceptance.xlt.report.DataParserThread.PostprocessedDataContainer;
@@ -53,7 +54,7 @@ public class Dispatcher
     /**
      * Total number of directories to be or already have been processed
      */
-    private final SynchronizingCounter totalDirectories = new SynchronizingCounter();
+    private final AtomicInteger totalDirectories = new AtomicInteger();
 
     /**
      * The number of chunks that still need to be processed.
@@ -73,7 +74,7 @@ public class Dispatcher
     /**
      * Our progress bar
      */
-    private volatile ProgressBar progressBar;
+    private ProgressBar progressBar;
 
     /**
      * Where the processed data goes for final result evaluation
@@ -107,7 +108,7 @@ public class Dispatcher
      */
     public void incremementDirectoryCount()
     {
-        totalDirectories.increment();
+        totalDirectories.incrementAndGet();
         remainingDirectories.increment();
     }
 
