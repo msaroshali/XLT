@@ -24,7 +24,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.vfs2.FileObject;
 
-import com.xceptance.common.lang.OpenStringBuilder;
 import com.xceptance.common.util.SimpleArrayList;
 import com.xceptance.common.util.XltCharBuffer;
 import com.xceptance.xlt.api.engine.ActionData;
@@ -263,6 +262,7 @@ class DataParserThread implements Runnable
                                     boolean removeIndexesFromRequestNames)
     {
         // fix up the name first (Product.1.2 -> Product) if so configured
+        // this can likely live in RequestData and act on XltCharBuffer instead String
         if (removeIndexesFromRequestNames)
         {
             // @TODO Chance for more performance here
