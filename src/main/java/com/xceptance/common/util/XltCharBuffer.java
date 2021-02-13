@@ -499,7 +499,7 @@ public class XltCharBuffer implements CharSequence, Comparable<XltCharBuffer>
         if (i1 < last) {
             h = h * 31 + src[i1];
         }
-
+        
         hashCode = h;
         return h; 
     }
