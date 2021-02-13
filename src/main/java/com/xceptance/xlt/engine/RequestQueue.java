@@ -21,7 +21,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
-import com.xceptance.common.util.Getter;
 import com.xceptance.common.util.SynchronizingCounter;
 import com.xceptance.common.util.concurrent.DaemonThreadFactory;
 import com.xceptance.xlt.api.engine.Session;
