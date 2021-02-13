@@ -44,7 +44,7 @@ public class Dispatcher
     /**
      * The maximum number of lines in a chunk.
      */
-    public static final int DEFAULT_QUEUE_LENGTH = 20;
+    public static final int DEFAULT_QUEUE_LENGTH = 100;
 
     /**
      * The number of directories that still need to be processed.
