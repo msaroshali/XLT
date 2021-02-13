@@ -452,10 +452,12 @@ public class RequestData extends TimerData
     public void setContentType(final String contentType)
     {
         this.contentType = XltCharBuffer.valueOf(contentType);
+        this.contentType.hashCode();
     }
     public void setContentType(final XltCharBuffer contentType)
     {
         this.contentType = contentType;
+        this.contentType.hashCode();
     }
     
     /**
@@ -717,7 +719,7 @@ public class RequestData extends TimerData
         if (values.size() > 22)
         {
             setUrl(values.get(8));
-            contentType = values.get(9);
+            setContentType(values.get(9));
 
             setConnectTime(ParseNumbers.parseInt(values.get(10)));
             setSendTime(ParseNumbers.parseInt(values.get(11)));

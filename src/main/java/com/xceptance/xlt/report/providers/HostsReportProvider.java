@@ -15,10 +15,7 @@
  */
 package com.xceptance.xlt.report.providers;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.xceptance.common.collection.FastHashMap;
 import com.xceptance.common.util.XltCharBuffer;
 import com.xceptance.xlt.api.engine.Data;
 import com.xceptance.xlt.api.engine.RequestData;
@@ -32,7 +29,7 @@ public class HostsReportProvider extends AbstractReportProvider
     /**
      * A mapping from host names to their corresponding {@link HostReport} objects.
      */
-    private final Map<XltCharBuffer, HostReport> hostReports = new HashMap<>(11);
+    private final FastHashMap<XltCharBuffer, HostReport> hostReports = new FastHashMap<>(11, 0.5f);
 
     /**
      * {@inheritDoc}
@@ -41,8 +38,7 @@ public class HostsReportProvider extends AbstractReportProvider
     public Object createReportFragment()
     {
         final HostsReport report = new HostsReport();
-
-        report.hosts = new ArrayList<HostReport>(hostReports.values());
+        report.hosts = hostReports.values();
 
         return report;
     }
