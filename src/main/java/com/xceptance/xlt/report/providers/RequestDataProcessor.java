@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.jfree.chart.JFreeChart;
@@ -37,9 +38,11 @@ import org.jfree.data.time.TimeSeries;
 import org.jfree.data.xy.XYIntervalSeries;
 import org.jfree.data.xy.XYIntervalSeriesCollection;
 
+import com.xceptance.common.util.XltCharBuffer;
 import com.xceptance.xlt.api.engine.Data;
 import com.xceptance.xlt.api.engine.RequestData;
 import com.xceptance.xlt.api.report.AbstractReportProvider;
+import com.xceptance.xlt.api.util.XltLogger;
 import com.xceptance.xlt.report.ReportGeneratorConfiguration;
 import com.xceptance.xlt.report.util.HistogramValueSet;
 import com.xceptance.xlt.report.util.IntMinMaxValueSet;
@@ -82,7 +85,7 @@ public class RequestDataProcessor extends BasicTimerDataProcessor
     /**
      * A set of distinct URLs. Contains at most {@link #MAXIMUM_NUMBER_OF_URLS} entries.
      */
-    private final Set<String> distinctUrlSet = new HashSet<String>(2 * MAXIMUM_NUMBER_OF_URLS + 1);
+    private final Set<XltCharBuffer> distinctUrlSet = new HashSet<>(2 * MAXIMUM_NUMBER_OF_URLS + 1);
 
     /**
      * The configured runtime segment boundaries. May be an empty array.
@@ -446,14 +449,12 @@ public class RequestDataProcessor extends BasicTimerDataProcessor
      *            the total number of distinct URLs
      * @return the URL list
      */
-    private UrlData getUrlList(final Set<String> urls, final int totalUrlCount)
+    private UrlData getUrlList(final Set<XltCharBuffer> urls, final int totalUrlCount)
     {
         final UrlData urlData = new UrlData();
 
         urlData.total = totalUrlCount;
-        urlData.list = new ArrayList<String>(urls);
-
-        Collections.sort(urlData.list);
+        urlData.list = urls.stream().map(XltCharBuffer::toString).collect(Collectors.toList());
 
         return urlData;
     }

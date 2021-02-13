@@ -26,7 +26,7 @@ public class FastString
     public FastString(final String data)
     {
         this.data = data;
-        this.hashCode = data.hashCode();
+        this.hashCode = hashCode();
         this.charArray = data.toCharArray();
     }
     
@@ -39,7 +39,31 @@ public class FastString
     @Override
     public int hashCode()
     {
-        return hashCode;
+        if (hashCode != 0)
+        {
+            return hashCode;
+        }
+        
+        final int length = data.length();
+
+        int h = 0;
+        int i0 = 0;
+        int i1 = 1;
+        int i2 = 2;
+        while (i2 < length) {
+            h = h * (31 * 31 * 31) + data.charAt(i0) * (31 * 31) + data.charAt(i1) * 31 + data.charAt(i2);
+            i0 = i2 + 1;
+            i1 = i0 + 1;
+            i2 = i1 + 1;
+        }
+        if (i0 < length) {
+            h = h * 31 + data.charAt(i0);
+        }
+        if (i1 < length) {
+            h = h * 31 + data.charAt(i1);
+        }
+        
+        return h;    
     }
     
     @Override

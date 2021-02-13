@@ -54,6 +54,6 @@ public class UrlRequestFilter extends AbstractPatternRequestFilter
     @Override
     protected String getText(final RequestData requestData)
     {
-        return requestData.getUrl();
+        return requestData.getUrl().toString();
     }
 }

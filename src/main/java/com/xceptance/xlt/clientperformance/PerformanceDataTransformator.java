@@ -27,6 +27,7 @@ import org.json.JSONObject;
 
 import com.gargoylesoftware.htmlunit.FormEncodingType;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
+import com.xceptance.common.util.XltCharBuffer;
 import com.xceptance.xlt.api.engine.GlobalClock;
 import com.xceptance.xlt.api.engine.PageLoadTimingData;
 import com.xceptance.xlt.api.engine.RequestData;
@@ -295,9 +296,9 @@ public final class PerformanceDataTransformator
         // set additional data only if we need to
         if (SessionImpl.COLLECT_ADDITIONAL_REQUEST_DATA)
         {
-            requestData.setHttpMethod(performanceRequest.getHttpMethod());
-            requestData.setFormData(performanceRequest.getFormData());
-            requestData.setFormDataEncoding(performanceRequest.getFormDataEncoding());
+            requestData.setHttpMethod(XltCharBuffer.valueOf(performanceRequest.getHttpMethod()));
+            requestData.setFormData(XltCharBuffer.valueOf(performanceRequest.getFormData()));
+            requestData.setFormDataEncoding(XltCharBuffer.valueOf(performanceRequest.getFormDataEncoding()));
         }
     }
 
