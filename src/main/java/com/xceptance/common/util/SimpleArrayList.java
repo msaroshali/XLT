@@ -17,7 +17,7 @@ public class SimpleArrayList<T> implements List<T>
         size = list.size;
     }
     
-    public SimpleArrayList(int capacity)
+    public SimpleArrayList(final int capacity)
     {
         data = new Object[capacity];
     }

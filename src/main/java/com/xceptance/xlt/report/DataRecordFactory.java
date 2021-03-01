@@ -18,7 +18,6 @@ package com.xceptance.xlt.report;
 import java.lang.reflect.Constructor;
 import java.util.Map;
 
-import com.xceptance.common.lang.OpenStringBuilder;
 import com.xceptance.common.util.XltCharBuffer;
 import com.xceptance.xlt.api.engine.Data;
 

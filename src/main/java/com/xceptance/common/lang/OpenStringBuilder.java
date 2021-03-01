@@ -61,10 +61,9 @@ public class OpenStringBuilder implements CharSequence, Appendable, Serializable
     char[] buffer; // package-protected for test code use only
     /** Current size of the buffer. */
     private int size;
-    /** The new line. */
-    private String newLine;
+
     /** The null text. */
-    private String nullText;
+    private static final String nullText = "null";
 
     // -----------------------------------------------------------------------
     /**
@@ -106,49 +105,12 @@ public class OpenStringBuilder implements CharSequence, Appendable, Serializable
 
     // -----------------------------------------------------------------------
     /**
-     * Gets the text to be appended when a new line is added.
-     *
-     * @return The new line text, null means use system default
-     */
-    public String getNewLineText() {
-        return newLine;
-    }
-
-    /**
-     * Sets the text to be appended when a new line is added.
-     *
-     * @param newLine
-     *            the new line text, null means use system default
-     * @return this, to enable chaining
-     */
-    public OpenStringBuilder setNewLineText(final String newLine) {
-        this.newLine = newLine;
-        return this;
-    }
-
-    // -----------------------------------------------------------------------
-    /**
      * Gets the text to be appended when null is added.
      *
      * @return The null text, null means no append
      */
     public String getNullText() {
         return nullText;
-    }
-
-    /**
-     * Sets the text to be appended when null is added.
-     *
-     * @param nullText
-     *            the null text, null means no append
-     * @return this, to enable chaining
-     */
-    public OpenStringBuilder setNullText(String nullText) {
-        if (nullText != null && nullText.isEmpty()) {
-            nullText = null;
-        }
-        this.nullText = nullText;
-        return this;
     }
 
     // -----------------------------------------------------------------------
@@ -447,23 +409,6 @@ public class OpenStringBuilder implements CharSequence, Appendable, Serializable
             }
         }
         return size - oldSize;
-    }
-
-    // -----------------------------------------------------------------------
-    /**
-     * Appends the new line string to this string builder.
-     * <p>
-     * The new line string can be altered using {@link #setNewLineText(String)}. This might be used to force the output
-     * to always use Unix line endings even when on Windows.
-     *
-     * @return this, to enable chaining
-     */
-    public OpenStringBuilder appendNewLine() {
-        if (newLine == null) {
-            append(System.lineSeparator());
-            return this;
-        }
-        return append(newLine);
     }
 
     /**
@@ -960,237 +905,6 @@ public class OpenStringBuilder implements CharSequence, Appendable, Serializable
      */
     public OpenStringBuilder append(final double value) {
         return append(String.valueOf(value));
-    }
-
-    // -----------------------------------------------------------------------
-    /**
-     * Appends an object followed by a new line to this string builder. Appending null will call {@link #appendNull()}.
-     *
-     * @param obj
-     *            the object to append
-     * @return this, to enable chaining
-     */
-    public OpenStringBuilder appendln(final Object obj) {
-        return append(obj).appendNewLine();
-    }
-
-    /**
-     * Appends a string followed by a new line to this string builder. Appending null will call {@link #appendNull()}.
-     *
-     * @param str
-     *            the string to append
-     * @return this, to enable chaining
-     */
-    public OpenStringBuilder appendln(final String str) {
-        return append(str).appendNewLine();
-    }
-
-    /**
-     * Appends part of a string followed by a new line to this string builder. Appending null will call
-     * {@link #appendNull()}.
-     *
-     * @param str
-     *            the string to append
-     * @param startIndex
-     *            the start index, inclusive, must be valid
-     * @param length
-     *            the length to append, must be valid
-     * @return this, to enable chaining
-     */
-    public OpenStringBuilder appendln(final String str, final int startIndex, final int length) {
-        return append(str, startIndex, length).appendNewLine();
-    }
-
-    /**
-     * Calls {@link String#format(String, Object...)} and appends the result.
-     *
-     * @param format
-     *            the format string
-     * @param objs
-     *            the objects to use in the format string
-     * @return {@code this} to enable chaining
-     * @see String#format(String, Object...)
-     */
-    public OpenStringBuilder appendln(final String format, final Object... objs) {
-        return append(format, objs).appendNewLine();
-    }
-
-    /**
-     * Appends a string buffer followed by a new line to this string builder. Appending null will call
-     * {@link #appendNull()}.
-     *
-     * @param str
-     *            the string buffer to append
-     * @return this, to enable chaining
-     */
-    public OpenStringBuilder appendln(final StringBuffer str) {
-        return append(str).appendNewLine();
-    }
-
-    /**
-     * Appends a string builder followed by a new line to this string builder. Appending null will call
-     * {@link #appendNull()}.
-     *
-     * @param str
-     *            the string builder to append
-     * @return this, to enable chaining
-     */
-    public OpenStringBuilder appendln(final StringBuilder str) {
-        return append(str).appendNewLine();
-    }
-
-    /**
-     * Appends part of a string builder followed by a new line to this string builder. Appending null will call
-     * {@link #appendNull()}.
-     *
-     * @param str
-     *            the string builder to append
-     * @param startIndex
-     *            the start index, inclusive, must be valid
-     * @param length
-     *            the length to append, must be valid
-     * @return this, to enable chaining
-     */
-    public OpenStringBuilder appendln(final StringBuilder str, final int startIndex, final int length) {
-        return append(str, startIndex, length).appendNewLine();
-    }
-
-    /**
-     * Appends part of a string buffer followed by a new line to this string builder. Appending null will call
-     * {@link #appendNull()}.
-     *
-     * @param str
-     *            the string to append
-     * @param startIndex
-     *            the start index, inclusive, must be valid
-     * @param length
-     *            the length to append, must be valid
-     * @return this, to enable chaining
-     */
-    public OpenStringBuilder appendln(final StringBuffer str, final int startIndex, final int length) {
-        return append(str, startIndex, length).appendNewLine();
-    }
-
-    /**
-     * Appends another string builder followed by a new line to this string builder. Appending null will call
-     * {@link #appendNull()}.
-     *
-     * @param str
-     *            the string builder to append
-     * @return this, to enable chaining
-     */
-    public OpenStringBuilder appendln(final OpenStringBuilder str) {
-        return append(str).appendNewLine();
-    }
-
-    /**
-     * Appends part of a string builder followed by a new line to this string builder. Appending null will call
-     * {@link #appendNull()}.
-     *
-     * @param str
-     *            the string to append
-     * @param startIndex
-     *            the start index, inclusive, must be valid
-     * @param length
-     *            the length to append, must be valid
-     * @return this, to enable chaining
-     */
-    public OpenStringBuilder appendln(final OpenStringBuilder str, final int startIndex, final int length) {
-        return append(str, startIndex, length).appendNewLine();
-    }
-
-    /**
-     * Appends a char array followed by a new line to the string builder. Appending null will call
-     * {@link #appendNull()}.
-     *
-     * @param chars
-     *            the char array to append
-     * @return this, to enable chaining
-     */
-    public OpenStringBuilder appendln(final char[] chars) {
-        return append(chars).appendNewLine();
-    }
-
-    /**
-     * Appends a char array followed by a new line to the string builder. Appending null will call
-     * {@link #appendNull()}.
-     *
-     * @param chars
-     *            the char array to append
-     * @param startIndex
-     *            the start index, inclusive, must be valid
-     * @param length
-     *            the length to append, must be valid
-     * @return this, to enable chaining
-     */
-    public OpenStringBuilder appendln(final char[] chars, final int startIndex, final int length) {
-        return append(chars, startIndex, length).appendNewLine();
-    }
-
-    /**
-     * Appends a boolean value followed by a new line to the string builder.
-     *
-     * @param value
-     *            the value to append
-     * @return this, to enable chaining
-     */
-    public OpenStringBuilder appendln(final boolean value) {
-        return append(value).appendNewLine();
-    }
-
-    /**
-     * Appends a char value followed by a new line to the string builder.
-     *
-     * @param ch
-     *            the value to append
-     * @return this, to enable chaining
-     */
-    public OpenStringBuilder appendln(final char ch) {
-        return append(ch).appendNewLine();
-    }
-
-    /**
-     * Appends an int value followed by a new line to the string builder using <code>String.valueOf</code>.
-     *
-     * @param value
-     *            the value to append
-     * @return this, to enable chaining
-     */
-    public OpenStringBuilder appendln(final int value) {
-        return append(value).appendNewLine();
-    }
-
-    /**
-     * Appends a long value followed by a new line to the string builder using <code>String.valueOf</code>.
-     *
-     * @param value
-     *            the value to append
-     * @return this, to enable chaining
-     */
-    public OpenStringBuilder appendln(final long value) {
-        return append(value).appendNewLine();
-    }
-
-    /**
-     * Appends a float value followed by a new line to the string builder using <code>String.valueOf</code>.
-     *
-     * @param value
-     *            the value to append
-     * @return this, to enable chaining
-     */
-    public OpenStringBuilder appendln(final float value) {
-        return append(value).appendNewLine();
-    }
-
-    /**
-     * Appends a double value followed by a new line to the string builder using <code>String.valueOf</code>.
-     *
-     * @param value
-     *            the value to append
-     * @return this, to enable chaining
-     */
-    public OpenStringBuilder appendln(final double value) {
-        return append(value).appendNewLine();
     }
 
     // -----------------------------------------------------------------------

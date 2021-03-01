@@ -15,7 +15,6 @@
  */
 package com.xceptance.xlt.api.engine;
 
-import com.xceptance.common.lang.OpenStringBuilder;
 import com.xceptance.common.util.XltCharBuffer;
 
 /**

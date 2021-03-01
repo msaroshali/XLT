@@ -416,7 +416,7 @@ public class ReportGeneratorConfiguration extends AbstractConfiguration implemen
         chartsHeight = getIntProperty(PROP_CHARTS_HEIGHT, 300);
         movingAveragePoints = getIntProperty(PROP_CHARTS_MOV_AVG_PERCENTAGE, 5);
 
-        readerThreadCount = Math.max(1, getIntProperty(PROP_READER_THREAD_COUNT, Runtime.getRuntime().availableProcessors() / 2));
+        readerThreadCount = Math.max(1, getIntProperty(PROP_READER_THREAD_COUNT, Runtime.getRuntime().availableProcessors()));
         parserThreadCount = Math.max(1, getIntProperty(PROP_PARSER_THREAD_COUNT, Runtime.getRuntime().availableProcessors()));
         statisticsThreadCount = Math.max(1, getIntProperty(PROP_STATISTICS_THREAD_COUNT, Runtime.getRuntime().availableProcessors()));
         threadQueueBucketSize = Math.max(1, getIntProperty(PROP_THREAD_QUEUE_SIZE, Dispatcher.DEFAULT_QUEUE_CHUNK_SIZE));

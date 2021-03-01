@@ -18,7 +18,6 @@ package com.xceptance.xlt.api.engine;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.xceptance.common.lang.OpenStringBuilder;
 import com.xceptance.common.lang.ParseNumbers;
 import com.xceptance.common.util.CsvUtils;
 import com.xceptance.common.util.CsvUtilsDecode;

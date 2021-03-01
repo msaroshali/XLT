@@ -1,5 +1,7 @@
 package com.xceptance.common.util;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -27,7 +29,7 @@ public class XltCharBufferTest
             final char[] src = "TestFoobarRally".toCharArray();
             final XltCharBuffer b = new XltCharBuffer(src);
             Assert.assertEquals(String.valueOf(src), b.toString());
-            
+
             Assert.assertEquals("Test", b.viewByLength(0, 4).toString());
             Assert.assertEquals("Foobar", b.viewByLength(4, 6).toString());
             Assert.assertEquals("Rally", b.viewByLength(10, 5).toString());
@@ -39,7 +41,7 @@ public class XltCharBufferTest
     {
         final char[] src = "Test".toCharArray();
         final XltCharBuffer b = new XltCharBuffer(src);
-        
+
         b.put(1, 'ä'); Assert.assertEquals("Täst", b.toString());
         b.put(0, '1'); Assert.assertEquals("1äst", b.toString());
         b.put(3, '3'); Assert.assertEquals("1äs3", b.toString());
@@ -53,7 +55,7 @@ public class XltCharBufferTest
         final XltCharBuffer b = new XltCharBuffer(src);
         final XltCharBuffer b1 = b.viewByLength(0, 4);
         final XltCharBuffer b2 = b.viewByLength(4, 3);
-        
+
         b1.put(1, 'ä');
         Assert.assertEquals("Täst", b1.toString());
         Assert.assertEquals("Foo", b2.toString());
@@ -72,11 +74,11 @@ public class XltCharBufferTest
         final XltCharBuffer b = new XltCharBuffer(src);
         final XltCharBuffer b1 = b.viewByLength(0, 4);
         final XltCharBuffer b2 = b.viewByLength(4, 3);
-        
+
         Assert.assertEquals('T', b.get(0));
         Assert.assertEquals('o', b.get(5));
         Assert.assertEquals('2', b.get(6));
-        
+
         Assert.assertEquals('T', b1.get(0));
         Assert.assertEquals('e', b1.get(1));
         Assert.assertEquals('s', b1.get(2));
@@ -92,7 +94,7 @@ public class XltCharBufferTest
     {
         final char[] src = "TestFo2".toCharArray();
         final XltCharBuffer b = new XltCharBuffer(src);
-        
+
         Assert.assertEquals("", b.viewByLength(0, 0).toString());
         Assert.assertEquals("T", b.viewByLength(0, 1).toString());
         Assert.assertEquals("TestFo2", b.viewByLength(0, 7).toString());
@@ -105,7 +107,7 @@ public class XltCharBufferTest
     {
         final char[] src = "TestFo2".toCharArray();
         final XltCharBuffer b = new XltCharBuffer(src);
-        
+
         // Assert.assertEquals("", b.viewFromTo(0, 0).toString());
         Assert.assertEquals("T", b.viewFromTo(0, 1).toString());
         Assert.assertEquals("TestFo2", b.viewFromTo(0, 7).toString());
@@ -116,7 +118,7 @@ public class XltCharBufferTest
         Assert.assertEquals("Fo2", b.viewFromTo(4, 7).toString());
 
     }
-    
+
     @Test
     public void peakAhead()
     {
@@ -134,16 +136,16 @@ public class XltCharBufferTest
         Assert.assertEquals(0, b.peakAhead(8));
     }
 
-//    @Test
-//    public void viewOfViews()
-//    {
-//        final char[] src = "TestFo2".toCharArray();
-//        final XltCharBuffer b = new XltCharBuffer(src);
-//        
-//        Assert.assertEquals("", b.viewFromTo(0, 0).toString());
-//
-//    }
-//    
+    //    @Test
+    //    public void viewOfViews()
+    //    {
+    //        final char[] src = "TestFo2".toCharArray();
+    //        final XltCharBuffer b = new XltCharBuffer(src);
+    //        
+    //        Assert.assertEquals("", b.viewFromTo(0, 0).toString());
+    //
+    //    }
+    //    
     @Test
     public void length()
     {
@@ -162,11 +164,53 @@ public class XltCharBufferTest
     {
         final char[] src = "TestFo2".toCharArray();
         final XltCharBuffer b = new XltCharBuffer(src);
-        
+
         Assert.assertEquals(0, b.viewByLength(0, 0).length());
         Assert.assertEquals("", b.viewByLength(0, 0).toString());
-        
+
         Assert.assertEquals(0, XltCharBuffer.empty().length());
         Assert.assertEquals("", XltCharBuffer.empty().toString());
+    }
+
+    @Test
+    public void indexOf_char()
+    {
+        Assert.assertEquals(-1, XltCharBuffer.valueOf("").indexOf('a'));
+        Assert.assertEquals(-1, XltCharBuffer.valueOf("a").indexOf('b'));
+        Assert.assertEquals(0, XltCharBuffer.valueOf("b").indexOf('b'));
+        Assert.assertEquals(0, XltCharBuffer.valueOf("ba").indexOf('b'));
+        Assert.assertEquals(0, XltCharBuffer.valueOf("bab").indexOf('b'));
+        Assert.assertEquals(0, XltCharBuffer.valueOf("abc").indexOf('a'));
+        Assert.assertEquals(1, XltCharBuffer.valueOf("abc").indexOf('b'));
+        Assert.assertEquals(2, XltCharBuffer.valueOf("abc").indexOf('c'));
+        Assert.assertEquals(-1, XltCharBuffer.valueOf("abc").indexOf('d'));
+    }
+
+    @Test
+    public void compare()
+    {
+        {
+            // basics
+            assertEquals(0, XltCharBuffer.valueOf("").compareTo(XltCharBuffer.valueOf("")));
+            assertEquals(-1, XltCharBuffer.valueOf("a").compareTo(XltCharBuffer.valueOf("b")));
+            assertEquals(1, XltCharBuffer.valueOf("b").compareTo(XltCharBuffer.valueOf("a")));
+        }
+        {
+            XltCharBuffer a = XltCharBuffer.valueOf("abcd").substring(0, 1);
+            XltCharBuffer b = XltCharBuffer.valueOf("abcd").substring(1, 2);
+            
+            assertEquals(0, a.compareTo(a));
+            assertEquals(-1, a.compareTo(b));
+            assertEquals(1, b.compareTo(a));
+        }
+        {
+            XltCharBuffer x = XltCharBuffer.valueOf("1234abcd1234").substring(4, 8);
+            XltCharBuffer a = x.substring(0, 1);
+            XltCharBuffer b = x.substring(1, 2);
+            
+            assertEquals(0, a.compareTo(a));
+            assertEquals(-1, a.compareTo(b));
+            assertEquals(1, b.compareTo(a));
+        }
     }
 }

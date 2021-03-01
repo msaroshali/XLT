@@ -13,14 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.xceptance.xlt.report;
+package com.xceptance.xlt.report.benchmark;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.zip.GZIPInputStream;
 
@@ -29,11 +32,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileType;
 
-import com.xceptance.common.io.LeanestBufferedReaderAppend;
-import com.xceptance.common.io.MyBufferedReader;
-import com.xceptance.common.lang.OpenStringBuilder;
-import com.xceptance.common.util.SimpleArrayList;
-import com.xceptance.common.util.XltCharBuffer;
 import com.xceptance.xlt.common.XltConstants;
 
 /**
@@ -47,41 +45,12 @@ class DataReaderThread implements Runnable
     private static final Log LOG = LogFactory.getLog(DataReaderThread.class);
 
     /**
-     * Maps the start time of an action to the action name. This data structure is defined here (as it is tied to a
-     * certain input directory/test user), but will be maintained and used by the parser threads.
-     */
-    private final ConcurrentSkipListMap<Long, String> actionNames = new ConcurrentSkipListMap<Long, String>();
-
-    /**
-     * The name of the agent the test user was run on.
-     */
-    private final String agentName;
-
-    /**
      * The directory with the test user's result files.
      */
     private final FileObject directory;
 
-    /**
-     * The name of the test case the test user was executing.
-     */
-    private final String testCaseName;
-
-    /**
-     * The global line counter.
-     */
-    private final AtomicLong totalLineCounter;
-
-    /**
-     * The instance number of the test user.
-     */
-    private final String userNumber;
-
-    /**
-     * The dispatcher that coordinates result processing.
-     */
-    private final Dispatcher dispatcher;
-
+    private final AtomicLong total; 
+    
     /**
      * Constructor.
      *
@@ -98,16 +67,10 @@ class DataReaderThread implements Runnable
      * @param dispatcher
      *            the dispatcher that coordinates result processing
      */
-    public DataReaderThread(final FileObject directory, final String agentName, final String testCaseName, final String userNumber,
-                            final AtomicLong totalLineCounter, final Dispatcher dispatcher)
+    public DataReaderThread(final FileObject directory, final AtomicLong total)
     {
         this.directory = directory;
-        this.agentName = agentName;
-        this.testCaseName = testCaseName;
-        this.userNumber = userNumber;
-        
-        this.totalLineCounter = totalLineCounter;
-        this.dispatcher = dispatcher;
+        this.total = total;
     }
 
     /**
@@ -118,8 +81,6 @@ class DataReaderThread implements Runnable
     {
         try
         {
-            dispatcher.beginReading();
-
             readLogsFromTestUserDir();
         }
         catch (final Exception e)
@@ -129,7 +90,6 @@ class DataReaderThread implements Runnable
         }
         finally
         {
-            dispatcher.finishedReading();
         }
     }
 
@@ -141,12 +101,15 @@ class DataReaderThread implements Runnable
      */
     private void readLogsFromTestUserDir() throws Exception
     {
+//        XltLogger.runTimeLogger.info("Reading started for " + directory);
+        
         final ArrayList<FileObject> regularTimerFiles = new ArrayList<FileObject>();
         final ArrayList<FileObject> clientPerformanceTimerFiles = new ArrayList<FileObject>();
 
         // get all readable files
         for (final FileObject file : directory.getChildren())
         {
+//            XltLogger.runTimeLogger.info("  File " + file);
             if (file.getType() == FileType.FILE && file.isReadable())
             {
                 final String fileName = file.getName().getBaseName();
@@ -200,63 +163,36 @@ class DataReaderThread implements Runnable
         // LOG.info(String.format("Reading file '%s' ...", file));
 
         final boolean isCompressed = "gz".equalsIgnoreCase(file.getName().getExtension());
-        final int chunkSize = dispatcher.chunkSize;
-        
+        final int chunkSize = 1000;
+
         // VFS has not performance impact, hence this test code can stay here for later if needed, but might
         // not turn into a feature
-        //try (final MyBufferedReader reader = new MyBufferedReader(new FileReader(file.toString().replaceFirst("^file://", ""))))
-//        try (final MyBufferedReader reader = new MyBufferedReader(new InputStreamReader(Files.newInputStream(Paths.get(new URI(file.toString()))))))
+//        try (final MyBufferedReader reader = new MyBufferedReader(new FileReader(file.toString().replaceFirst("^file://", ""))))
+        //        try (final MyBufferedReader reader = new MyBufferedReader(new InputStreamReader(Files.newInputStream(Paths.get(new URI(file.toString()))))))
+
         
-//         try (final MyBufferedReader reader = new MyBufferedReader(new InputStreamReader(new GZIPInputStream(file.getContent().getInputStream()), XltConstants.UTF8_ENCODING)))
-        try (final LeanestBufferedReaderAppend reader = new LeanestBufferedReaderAppend(
-                                                                  new InputStreamReader(
-                                                                      isCompressed ? 
-                                                                                  new GZIPInputStream(file.getContent().getInputStream()) : file.getContent().getInputStream()
-                                                                                  , XltConstants.UTF8_ENCODING)))
+        try (final BufferedReader reader = new BufferedReader(
+                                                                  new InputStreamReader(file.getContent().getInputStream())))
+//        try(final BufferedReader reader = Files.newBufferedReader(Paths.get(new URI(file.toString()))))
         {
-            List<XltCharBuffer> lines = new SimpleArrayList<>(chunkSize + 1);
             int baseLineNumber = 1;  // let line numbering start at 1
             int linesRead = 0;
 
             // read the file line-by-line
-            XltCharBuffer line;
+            String line;
             while ((line = reader.readLine()) != null)
             {
                 linesRead++;
-                lines.add(line);
-
-                // have we filled the chunk?
-                if (linesRead == chunkSize)
-                {
-                    // the chunk is full -> deliver it
-                    final DataChunk lineChunk = new DataChunk(lines, baseLineNumber, file, agentName, testCaseName, userNumber, collectActionNames, adjustTimerName, actionNames);
-                    
-                    // deliver to dispatcher, this might block
-                    dispatcher.addReadData(lineChunk);
-                    
-                    // start a new chunk
-                    lines = new SimpleArrayList<>(chunkSize + 1);
-                    baseLineNumber += linesRead;
-
-                    totalLineCounter.addAndGet(linesRead);
-
-                    linesRead = 0;
-                }
             }
 
-            // deliver any remaining lines
-            if (linesRead > 0)
-            {
-                final DataChunk lineChunk = new DataChunk(lines, baseLineNumber, file, agentName, testCaseName, userNumber, collectActionNames, adjustTimerName, actionNames);
-                dispatcher.addReadData(lineChunk);
-                
-                totalLineCounter.addAndGet(linesRead);
-            }
+            total.addAndGet(linesRead);
         }
         catch (final Exception ex)
         {
             final String msg = String.format("Failed to read file '%s'", file);
             LOG.error(msg, ex);
         }
+
+
     }
 }

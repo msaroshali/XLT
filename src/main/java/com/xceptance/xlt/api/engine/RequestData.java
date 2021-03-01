@@ -24,6 +24,7 @@ import com.xceptance.common.lang.StringHasher;
 import com.xceptance.common.util.XltCharBuffer;
 import com.xceptance.xlt.engine.util.FastString;
 import com.xceptance.xlt.engine.util.UrlUtils;
+import com.xceptance.xlt.report.util.UrlHostParser;
 
 /**
  * <p>
@@ -59,7 +60,7 @@ public class RequestData extends TimerData
     /**
      * The value to show if the host could not be determined from a URL.
      */
-    public final static FastString UNKNOWN_HOST = new FastString("(unknown)", "(unknown)".hashCode());
+    public final static XltCharBuffer UNKNOWN_HOST = XltCharBuffer.valueOf("(unknown)");
     
     /**
      * The size of the response message in bytes.
@@ -79,7 +80,7 @@ public class RequestData extends TimerData
     /**
      * The content type of the response.
      */
-    private FastString contentType;
+    private XltCharBuffer contentType;
 
     /**
      * The time it took to receive the response from the server.
@@ -119,17 +120,17 @@ public class RequestData extends TimerData
     /**
      * The value to identify a request.
      */
-    private String requestId;
+    private XltCharBuffer requestId;
 
     /**
      * The response ID that was sent back by the server.
      */
-    private String responseId;
+    private XltCharBuffer responseId;
 
     /**
      * The request URL.
      */
-    private String url;
+    private XltCharBuffer url;
 
     /**
      * The hash code of a url without fragment, needed downstream
@@ -139,22 +140,22 @@ public class RequestData extends TimerData
     /**
      * The host, parsed from the url early in the process
      */
-    private FastString host;
+    private XltCharBuffer host;
     
     /**
      * The HTTP-Method of this request.
      */
-    private String httpMethod;
+    private XltCharBuffer httpMethod;
 
     /**
      * The form data encoding.
      */
-    private String formDataEncoding;
+    private XltCharBuffer formDataEncoding;
 
     /**
      * The form data.
      */
-    private String formData;
+    private XltCharBuffer formData;
 
     /**
      * The list of IP addresses reported by DNS for the host name used when making the request. If there is more than
@@ -217,7 +218,7 @@ public class RequestData extends TimerData
      * 
      * @return the content type
      */
-    public FastString getContentType()
+    public XltCharBuffer getContentType()
     {
         return contentType;
     }
@@ -301,7 +302,7 @@ public class RequestData extends TimerData
      */
     public String getRequestId()
     {
-        return requestId;
+        return requestId == null ? null : requestId.toString();
     }
 
     /**
@@ -311,7 +312,7 @@ public class RequestData extends TimerData
      */
     public String getResponseId()
     {
-        return responseId;
+        return responseId == null ? null : responseId.toString();
     }
 
     /**
@@ -319,7 +320,7 @@ public class RequestData extends TimerData
      * 
      * @return the URL
      */
-    public String getUrl()
+    public XltCharBuffer getUrl()
     {
         return url;
     }
@@ -340,7 +341,7 @@ public class RequestData extends TimerData
      * 
      * @return the host from the url
      */
-    public FastString getHost()
+    public XltCharBuffer getHost()
     {
         return host;
     }
@@ -350,7 +351,7 @@ public class RequestData extends TimerData
      * 
      * @return the HTTP method.
      */
-    public String getHttpMethod()
+    public XltCharBuffer getHttpMethod()
     {
         return httpMethod;
     }
@@ -360,7 +361,7 @@ public class RequestData extends TimerData
      * 
      * @return the data encoding.
      */
-    public String getFormDataEncoding()
+    public XltCharBuffer getFormDataEncoding()
     {
         return formDataEncoding;
     }
@@ -370,7 +371,7 @@ public class RequestData extends TimerData
      * 
      * @return the form data.
      */
-    public String getFormData()
+    public XltCharBuffer getFormData()
     {
         return formData;
     }
@@ -450,9 +451,15 @@ public class RequestData extends TimerData
      */
     public void setContentType(final String contentType)
     {
-        this.contentType = new FastString(contentType);
+        this.contentType = XltCharBuffer.valueOf(contentType);
+        this.contentType.hashCode();
     }
-
+    public void setContentType(final XltCharBuffer contentType)
+    {
+        this.contentType = contentType;
+        this.contentType.hashCode();
+    }
+    
     /**
      * Sets the time it took to receive the response from the server.
      * 
@@ -472,7 +479,7 @@ public class RequestData extends TimerData
      * @deprecated Use {@link #setRequestId(String)} instead.
      */
     @Deprecated
-    public void setId(final String id)
+    public void setId(final XltCharBuffer id)
     {
         setRequestId(id);
     }
@@ -483,7 +490,7 @@ public class RequestData extends TimerData
      * @param id
      *            the request ID
      */
-    public void setRequestId(final String id)
+    public void setRequestId(final XltCharBuffer id)
     {
         this.requestId = id;
     }
@@ -494,7 +501,7 @@ public class RequestData extends TimerData
      * @param id
      *            the response ID
      */
-    public void setResponseId(final String id)
+    public void setResponseId(final XltCharBuffer id)
     {
         this.responseId = id;
     }
@@ -569,7 +576,7 @@ public class RequestData extends TimerData
      */
     public void setUrl(final String url)
     {
-        this.url = url;
+        this.url = XltCharBuffer.valueOf(url);
     }
     
     /**
@@ -586,10 +593,9 @@ public class RequestData extends TimerData
         // remove the fragment if any and compute the hash
         this.hashCodeOfUrlWithoutFragment = StringHasher.hashCodeWithLimit(url, '#');
 
-        final String _url = url.toString();
-        final FastString hostName = UrlUtils.retrieveHostFromUrl(_url);
+        final XltCharBuffer hostName = UrlHostParser.retrieveHostFromUrl(url);
         
-        if (hostName.toString().length() == 0)
+        if (hostName.length() == 0)
         {
             host = UNKNOWN_HOST;
         }
@@ -598,7 +604,7 @@ public class RequestData extends TimerData
             host = hostName;
         }
         
-        this.url = _url;
+        this.url = url;
     }
 
     /**
@@ -607,7 +613,7 @@ public class RequestData extends TimerData
      * @param httpMethod
      *            the new httpMethod value
      */
-    public void setHttpMethod(String httpMethod)
+    public void setHttpMethod(XltCharBuffer httpMethod)
     {
         this.httpMethod = httpMethod;
     }
@@ -618,7 +624,7 @@ public class RequestData extends TimerData
      * @param encoding
      *            the new encoding
      */
-    public void setFormDataEncoding(String encoding)
+    public void setFormDataEncoding(XltCharBuffer encoding)
     {
         this.formDataEncoding = encoding;
     }
@@ -629,7 +635,7 @@ public class RequestData extends TimerData
      * @param formData
      *            the new data
      */
-    public void setFormData(String formData)
+    public void setFormData(XltCharBuffer formData)
     {
         this.formData = formData;
     }
@@ -667,7 +673,7 @@ public class RequestData extends TimerData
         fields.add(Integer.toString(bytesSent));
         fields.add(Integer.toString(bytesReceived));
         fields.add(Integer.toString(responseCode));
-        fields.add(StringUtils.defaultString(url));
+        fields.add(XltCharBuffer.emptyWhenNull(url).toString());
         fields.add(StringUtils.defaultString(contentType.toString()));
         fields.add(String.valueOf(connectTime));
         fields.add(String.valueOf(sendTime));
@@ -675,16 +681,16 @@ public class RequestData extends TimerData
         fields.add(String.valueOf(receiveTime));
         fields.add(String.valueOf(timeToFirstBytes));
         fields.add(String.valueOf(timeToLastBytes));
-        fields.add(StringUtils.defaultString(requestId));
+        fields.add(XltCharBuffer.emptyWhenNull(requestId).toString());
 
-        fields.add(StringUtils.defaultString(httpMethod));
-        fields.add(StringUtils.defaultString(formDataEncoding));
-        fields.add(StringUtils.defaultString(formData));
+        fields.add(XltCharBuffer.emptyWhenNull(httpMethod).toString());
+        fields.add(XltCharBuffer.emptyWhenNull(formDataEncoding).toString());
+        fields.add(XltCharBuffer.emptyWhenNull(formData).toString());
 
         fields.add(String.valueOf(dnsTime));
         fields.add(StringUtils.defaultString(ipAddresses));
 
-        fields.add(StringUtils.defaultString(responseId));
+        fields.add(XltCharBuffer.emptyWhenNull(responseId).toString());
 
         return fields;
     }
@@ -713,7 +719,7 @@ public class RequestData extends TimerData
         if (values.size() > 22)
         {
             setUrl(values.get(8));
-            contentType = new FastString(values.get(9).toString());
+            setContentType(values.get(9));
 
             setConnectTime(ParseNumbers.parseInt(values.get(10)));
             setSendTime(ParseNumbers.parseInt(values.get(11)));
@@ -721,13 +727,13 @@ public class RequestData extends TimerData
             setReceiveTime(ParseNumbers.parseInt(values.get(13)));
             setTimeToFirstBytes(ParseNumbers.parseInt(values.get(14)));
             setTimeToLastBytes(ParseNumbers.parseInt(values.get(15)));
-            setRequestId(values.get(16).toString());
-            setHttpMethod(values.get(17).toString());
-            setFormDataEncoding(values.get(18).toString());
-            setFormData(values.get(19).toString());
+            setRequestId(values.get(16));
+            setHttpMethod(values.get(17));
+            setFormDataEncoding(values.get(18));
+            setFormData(values.get(19));
             setDnsTime(ParseNumbers.parseInt(values.get(20)));
             ipAddresses = values.get(21).toString();
-            setResponseId(values.get(22).toString());
+            setResponseId(values.get(22));
         }
         else
         {
@@ -748,12 +754,12 @@ public class RequestData extends TimerData
         final int length = values.size();
         if (length > 8)
         {
-            url = values.get(8).toString();
+            url = values.get(8);
         }
 
         if (length > 9)
         {
-            contentType = new FastString(values.get(9).toString());
+            contentType = values.get(9);
         }
 
         if (length > 10)
@@ -768,15 +774,15 @@ public class RequestData extends TimerData
 
         if (length > 16)
         {
-            setRequestId(values.get(16).toString());
+            setRequestId(values.get(16));
         }
 
         // XLT 4.6.0
         if (length > 17)
         {
-            setHttpMethod(values.get(17).toString());
-            setFormDataEncoding(values.get(18).toString());
-            setFormData(values.get(19).toString());
+            setHttpMethod(values.get(17));
+            setFormDataEncoding(values.get(18));
+            setFormData(values.get(19));
         }
 
         // XLT 4.7.0

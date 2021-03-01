@@ -17,6 +17,7 @@ package com.xceptance.xlt.api.engine;
 
 import java.util.List;
 
+import com.xceptance.common.lang.ParseBoolean;
 import com.xceptance.common.lang.ParseNumbers;
 import com.xceptance.common.util.XltCharBuffer;
 
@@ -154,7 +155,7 @@ public abstract class TimerData extends AbstractData
             throw new IllegalArgumentException("Invalid value for the 'runtime' attribute.");
         }
 
-        failed = Boolean.valueOf(values.get(4).toString());
+        failed = ParseBoolean.parse(values.get(4));
     }
 
     /**
