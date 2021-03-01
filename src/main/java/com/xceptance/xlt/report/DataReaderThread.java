@@ -29,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileType;
 
+import com.xceptance.common.io.LeanestBufferedReaderAppend;
 import com.xceptance.common.io.MyBufferedReader;
 import com.xceptance.common.lang.OpenStringBuilder;
 import com.xceptance.common.util.SimpleArrayList;
@@ -207,7 +208,7 @@ class DataReaderThread implements Runnable
 //        try (final MyBufferedReader reader = new MyBufferedReader(new InputStreamReader(Files.newInputStream(Paths.get(new URI(file.toString()))))))
         
 //         try (final MyBufferedReader reader = new MyBufferedReader(new InputStreamReader(new GZIPInputStream(file.getContent().getInputStream()), XltConstants.UTF8_ENCODING)))
-        try (final MyBufferedReader reader = new MyBufferedReader(
+        try (final LeanestBufferedReaderAppend reader = new LeanestBufferedReaderAppend(
                                                                   new InputStreamReader(
                                                                       isCompressed ? 
                                                                                   new GZIPInputStream(file.getContent().getInputStream()) : file.getContent().getInputStream()
@@ -218,11 +219,11 @@ class DataReaderThread implements Runnable
             int linesRead = 0;
 
             // read the file line-by-line
-            OpenStringBuilder line;
-            while ((line = reader.readLine(false)) != null)
+            XltCharBuffer line;
+            while ((line = reader.readLine()) != null)
             {
                 linesRead++;
-                lines.add(XltCharBuffer.valueOf(line));
+                lines.add(line);
 
                 // have we filled the chunk?
                 if (linesRead == chunkSize)

@@ -35,7 +35,7 @@ public class XltCharBuffer implements CharSequence, Comparable<XltCharBuffer>
         this(src.getCharArray(), 0, src.length());
     }
 
-    XltCharBuffer(final char[] src, final int from, final int length)
+    public XltCharBuffer(final char[] src, final int from, final int length)
     {
         this.src = src == null ? new char[0] : src;
         this.from = from;
