@@ -246,7 +246,6 @@ public class ReportGeneratorConfiguration extends AbstractConfiguration implemen
 
     public final int readerThreadCount;
     public final int parserThreadCount;
-    public final int statisticsThreadCount;
     public final int threadQueueBucketSize;
     public final int threadQueueLength;
 
@@ -418,7 +417,7 @@ public class ReportGeneratorConfiguration extends AbstractConfiguration implemen
 
         readerThreadCount = Math.max(1, getIntProperty(PROP_READER_THREAD_COUNT, Runtime.getRuntime().availableProcessors()));
         parserThreadCount = Math.max(1, getIntProperty(PROP_PARSER_THREAD_COUNT, Runtime.getRuntime().availableProcessors()));
-        statisticsThreadCount = Math.max(1, getIntProperty(PROP_STATISTICS_THREAD_COUNT, Runtime.getRuntime().availableProcessors()));
+
         threadQueueBucketSize = Math.max(1, getIntProperty(PROP_THREAD_QUEUE_SIZE, Dispatcher.DEFAULT_QUEUE_CHUNK_SIZE));
         threadQueueLength = Math.max(1, getIntProperty(PROP_THREAD_QUEUE_LENGTH, Dispatcher.DEFAULT_QUEUE_LENGTH));
 

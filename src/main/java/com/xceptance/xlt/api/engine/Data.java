@@ -43,7 +43,7 @@ import com.xceptance.common.util.XltCharBuffer;
  * 
  * @author Jörg Werner (Xceptance Software Technologies GmbH)
  */
-public interface Data
+public interface Data extends Comparable<Data>
 {
     /**
      * The delimiter character (a comma) used to separate single values in a data record.

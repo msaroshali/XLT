@@ -70,7 +70,7 @@ public final class CsvUtilsDecode
      */
     public static List<XltCharBuffer> parse(final XltCharBuffer src, final char fieldSeparator)
     {
-        final SimpleArrayList<XltCharBuffer> result = new SimpleArrayList<>(50);
+        final SimpleArrayList<XltCharBuffer> result = new SimpleArrayList<>(32);
         
         final int size = src.length();
 

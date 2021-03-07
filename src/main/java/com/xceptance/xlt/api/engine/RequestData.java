@@ -727,8 +727,10 @@ public class RequestData extends TimerData
             setReceiveTime(ParseNumbers.parseInt(values.get(13)));
             setTimeToFirstBytes(ParseNumbers.parseInt(values.get(14)));
             setTimeToLastBytes(ParseNumbers.parseInt(values.get(15)));
+
             setRequestId(values.get(16));
             setHttpMethod(values.get(17));
+
             setFormDataEncoding(values.get(18));
             setFormData(values.get(19));
             setDnsTime(ParseNumbers.parseInt(values.get(20)));

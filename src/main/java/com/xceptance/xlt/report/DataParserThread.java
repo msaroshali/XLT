@@ -15,6 +15,8 @@
  */
 package com.xceptance.xlt.report;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
@@ -313,7 +315,7 @@ class DataParserThread implements Runnable
 
     public static class PostprocessedDataContainer
     {
-        private final SimpleArrayList<Data> data;
+        private final List<Data> data;
 
         /**
          * Creation time of last data record.
@@ -331,20 +333,20 @@ class DataParserThread implements Runnable
             data = new SimpleArrayList<>(size);
         }
 
-        public SimpleArrayList<Data> getData()
+        public List<Data> getData()
         {
             return data;
         }
 
         public void add(final Data d)
         {
+            data.add(d);
+
             // maintain statistics
             final long time = d.getTime();
 
             minimumTime = Math.min(minimumTime, time);
             maximumTime = Math.max(maximumTime, time);
-
-            data.add(d);
         }
 
         /**

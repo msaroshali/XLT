@@ -15,6 +15,8 @@
  */
 package com.xceptance.xlt.api.report;
 
+import java.util.List;
+
 import com.xceptance.xlt.api.engine.Data;
 
 /**
@@ -85,6 +87,8 @@ public interface ReportProvider extends ReportCreator
      */
     public void processDataRecord(Data data);
 
+    public void processAll(final List<Data> data);
+    
     /**
      * Sets the report provider's configuration. Use the configuration object to get access to general as well as
      * provider-specific properties stored in the global configuration file.
@@ -104,4 +108,7 @@ public interface ReportProvider extends ReportCreator
     {
         return true;
     }
+    
+    public boolean lock();
+    public void unlock();
 }
