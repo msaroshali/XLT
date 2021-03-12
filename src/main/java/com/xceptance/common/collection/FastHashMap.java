@@ -30,6 +30,11 @@ public class FastHashMap<K, V>
     /** Mask to wrap the actual array pointer */
     private int m_mask2;
 
+    public FastHashMap()
+    {
+        this(13, 0.5f);
+    }
+    
     public FastHashMap( final int size, final float fillFactor )
     {
         if ( fillFactor <= 0 || fillFactor >= 1 )
@@ -226,6 +231,28 @@ public class FastHashMap<K, V>
         }
     }
 
+    /**
+     * Returns a list of all values
+     * 
+     * @return
+     */
+    public List<K> keys()
+    {
+        final List<K> result = new ArrayList<>();
+        
+        final int length = m_data.length;
+        for (int i = 0; i < length; i += 2)
+        {
+            final Object o = m_data[i];
+            if (o != FREE_KEY && o != REMOVED_KEY)
+            {
+                result.add((K) o);
+            }
+        }
+        
+        return result;
+    }
+    
     /**
      * Returns a list of all values
      * 

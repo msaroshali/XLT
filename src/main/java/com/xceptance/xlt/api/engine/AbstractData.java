@@ -68,7 +68,7 @@ public abstract class AbstractData implements Data
         this.name = name;
         this.typeCode = typeCode;
     }
-    
+
     /**
      * Creates a new AbstractData object and gives it the specified type code.
      * 
@@ -79,7 +79,7 @@ public abstract class AbstractData implements Data
     {
         this(null, typeCode);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -240,7 +240,7 @@ public abstract class AbstractData implements Data
             // read and check the values
             name = values.get(1).toString();
             name.hashCode(); // create it when it is still hot in the cache
-            
+
             time = ParseNumbers.parseLong(values.get(2));
 
             if (time <= 0)
@@ -254,4 +254,23 @@ public abstract class AbstractData implements Data
                                                "' does not match the expected type code '" + typeCode + "'.");
         }
     }
+
+    @Override
+    public int compareTo(final Data o)
+    {
+        if (this.typeCode == o.getTypeCode())
+        {
+            return this.name.compareTo(o.getName());
+        }
+        else 
+        {
+            if (this.typeCode < o.getTypeCode())
+            {
+                return -1;
+            }
+        }
+        return 1;
+    }
+
+
 }

@@ -179,7 +179,7 @@ public class ReportGenerator
         {
             try
             {
-                final ReportProvider processor = c.newInstance();
+                final ReportProvider processor = c.getDeclaredConstructor().newInstance();
                 processor.setConfiguration(config);
 
                 reportProviders.add(processor);

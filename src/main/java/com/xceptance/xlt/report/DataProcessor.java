@@ -132,7 +132,7 @@ public class DataProcessor
         agentFilter = new StringMatcher(agentIncludePatternList, agentExcludePatternList, true);
 
         // the one and only data record processor
-        statisticsProcessor = new StatisticsProcessor(reportProviders, config.statisticsThreadCount);
+        statisticsProcessor = new StatisticsProcessor(reportProviders);
 
         // create the reader executor
         dataReaderExecutor = Executors.newFixedThreadPool(config.readerThreadCount, new DaemonThreadFactory(i -> "DataReader-" + i, Thread.MAX_PRIORITY));

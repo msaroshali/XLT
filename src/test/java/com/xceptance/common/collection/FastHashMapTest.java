@@ -37,6 +37,50 @@ public class FastHashMapTest
     }
 
     @Test
+    public void keys()
+    {
+        final FastHashMap<String, Integer> f = new FastHashMap<>(3, 0.5f);
+        f.put("aa", 1);
+        f.put("bb", 2);
+        f.put("cc", 3);
+        f.put("dd", 4);
+        f.put("ee", 5);
+
+        {
+            final List<String> k = f.keys();
+            assertEquals(5, k.size());
+            assertTrue(k.contains("aa"));
+            assertTrue(k.contains("bb"));
+            assertTrue(k.contains("cc"));
+            assertTrue(k.contains("dd"));
+            assertTrue(k.contains("ee"));
+        }
+
+        assertEquals(Integer.valueOf(3), f.remove("cc"));
+        f.remove("c");
+        {
+            final List<String> k = f.keys();
+            assertEquals(4, k.size());
+            assertTrue(k.contains("aa"));
+            assertTrue(k.contains("bb"));
+            assertTrue(k.contains("dd"));
+            assertTrue(k.contains("ee"));
+        }
+
+        f.put("zz", 10);
+        f.remove("c");
+        {
+            final List<String> k = f.keys();
+            assertEquals(5, k.size());
+            assertTrue(k.contains("aa"));
+            assertTrue(k.contains("bb"));
+            assertTrue(k.contains("dd"));
+            assertTrue(k.contains("ee"));
+            assertTrue(k.contains("zz"));
+        }
+    }
+    
+    @Test
     public void values()
     {
         final FastHashMap<String, Integer> f = new FastHashMap<>(3, 0.5f);

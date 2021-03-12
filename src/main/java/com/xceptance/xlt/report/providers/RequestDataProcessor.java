@@ -18,8 +18,6 @@ package com.xceptance.xlt.report.providers;
 import java.awt.Color;
 import java.io.File;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -42,7 +40,6 @@ import com.xceptance.common.util.XltCharBuffer;
 import com.xceptance.xlt.api.engine.Data;
 import com.xceptance.xlt.api.engine.RequestData;
 import com.xceptance.xlt.api.report.AbstractReportProvider;
-import com.xceptance.xlt.api.util.XltLogger;
 import com.xceptance.xlt.report.ReportGeneratorConfiguration;
 import com.xceptance.xlt.report.util.HistogramValueSet;
 import com.xceptance.xlt.report.util.IntMinMaxValueSet;
@@ -153,6 +150,11 @@ public class RequestDataProcessor extends BasicTimerDataProcessor
      */
     private final boolean countDistinctUrls;
 
+    /**
+     * Avoid to ask the set again for the size
+     */
+    private boolean distinctUrlSetLimitedReached = false;
+    
     /**
      * Constructor.
      *
@@ -307,9 +309,16 @@ public class RequestDataProcessor extends BasicTimerDataProcessor
             distinctUrlHashCodeSet.add(reqData.hashCodeOfUrlWithoutFragment());
 
             // remember some URLs (up to the limit)
-            if (distinctUrlSet.size() < MAXIMUM_NUMBER_OF_URLS)
+            if (distinctUrlSetLimitedReached == false)
             {
-                distinctUrlSet.add(reqData.getUrl());
+                if (distinctUrlSet.size() < MAXIMUM_NUMBER_OF_URLS)
+                {
+                    distinctUrlSet.add(reqData.getUrl());
+                }
+                else
+                {
+                    distinctUrlSetLimitedReached = true;
+                }
             }
         }
 

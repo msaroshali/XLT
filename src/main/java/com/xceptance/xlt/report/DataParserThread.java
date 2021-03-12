@@ -155,6 +155,9 @@ class DataParserThread implements Runnable
                             }
                             else
                             {
+                                // get us a hashcode for later while the cache is warm
+                                // for RequestData, we did that already
+                                data.getName().hashCode();
                                 postProcessedData.add(data);
                             }
                         }
@@ -308,12 +311,16 @@ class DataParserThread implements Runnable
             }
         }
 
+        // ok, we processed all rules for this dataset, get us the final hashcode for the name, because we need that later
+        // here the cache is likely still hot, so this is less expensive
+        requestData.getName().hashCode();
+        
         return requestData;
     }
 
     public static class PostprocessedDataContainer
     {
-        private final SimpleArrayList<Data> data;
+        private final List<Data> data;
 
         /**
          * Creation time of last data record.
@@ -331,20 +338,20 @@ class DataParserThread implements Runnable
             data = new SimpleArrayList<>(size);
         }
 
-        public SimpleArrayList<Data> getData()
+        public List<Data> getData()
         {
             return data;
         }
 
         public void add(final Data d)
         {
+            data.add(d);
+
             // maintain statistics
             final long time = d.getTime();
 
             minimumTime = Math.min(minimumTime, time);
             maximumTime = Math.max(maximumTime, time);
-
-            data.add(d);
         }
 
         /**

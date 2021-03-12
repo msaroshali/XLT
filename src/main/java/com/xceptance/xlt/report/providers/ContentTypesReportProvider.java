@@ -15,8 +15,6 @@
  */
 package com.xceptance.xlt.report.providers;
 
-import java.util.ArrayList;
-
 import com.xceptance.common.collection.FastHashMap;
 import com.xceptance.common.util.XltCharBuffer;
 import com.xceptance.xlt.api.engine.Data;

@@ -153,3 +153,131 @@ com.xceptance.xlt.report.providers.PageLoadTimingsReportProvider
 42,704,293 records read - 35,372 ms - 1,207,291 lines/s
 
 
+# StatisticsProcessor Tuning
+No Merge Rules, 20191024-143543
+42,704,293 records read - 23,149 ms - 1,844,758 lines/s
+42,704,293 records read - 22,747 ms - 1,877,359 lines/s
+
+Seriell StatProc, sync
+42,704,293 records read - 53,528 ms - 797,794 lines/s
+
+Sync per ReportProvider per line
+42,704,293 records read - 26,388 ms - 1,618,322 lines/s
+
+Sync per ReportProvider per line, Providers randomly shuffled
+42,704,293 records read - 27,508 ms - 1,552,432 lines/s
+
+Sync per ReportProvider per full loop, Providers randomly shuffled
+42,704,293 records read - 22,370 ms - 1,908,998 lines/s
+
+Softlock per provider with queue what still to do, do next when none free
+42,704,293 records read - 21,599 ms - 1,977,142 lines/s
+
+Let the provider run the loop, queued soft lock with next entry
+when currently locked (1)
+42,704,293 records read - 22,245 ms - 1,919,725 lines/s
+42,704,293 records read - 22,001 ms - 1,941,016 lines/s
+
+Like (1) but Thread.yield when not free provider
+42,704,293 records read - 20,470 ms - 2,086,189 lines/s
+42,704,293 records read - 20,148 ms - 2,119,530 lines/s
+
+# Stats with or without own threads
+Classic Stats Threads, one thread per provider, no merge rules
+==============================================================
+42,704,293 records read - 22,493 ms - 1,898,559 lines/s
+
+        208.645,30 msec task-clock                #    5,963 CPUs utilized          
+           311.478      context-switches          #    0,001 M/sec                  
+   655.155.732.719      cycles                    #    3,140 GHz                      (39,94%)
+ 1.048.974.283.241      instructions              #    1,60  insn per cycle         
+                                                  #    0,34  stalled cycles per insn  (39,92%)
+    34.006.183.611      stalled-cycles-frontend   #    5,19% frontend cycles idle     (39,95%)
+   359.375.603.152      stalled-cycles-backend    #   54,85% backend cycles idle      (39,99%)
+    21.364.376.353      cache-references          #  102,396 M/sec                    (40,08%)
+     5.243.155.767      cache-misses              #   24,542 % of all cache refs      (40,10%)
+   429.223.425.440      L1-dcache-loads           # 2057,192 M/sec                    (40,02%)
+    12.120.208.619      L1-dcache-load-misses     #    2,82% of all L1-dcache hits    (40,02%)
+   175.579.638.114      branches                  #  841,522 M/sec                    (40,01%)
+     1.263.227.622      branch-misses             #    0,72% of all branches          (39,97%)
+
+      34,989482464 seconds time elapsed
+
+     201,708117000 seconds user
+       7,774115000 seconds sys
+       
+And merge rules
+===============================================================
+42,704,293 records read - 38,501 ms - 1,109,174 lines/s
+42,704,293 records read - 37,887 ms - 1,127,149 lines/s
+
+        319.260,64 msec task-clock                #    6,221 CPUs utilized          
+           377.797      context-switches          #    0,001 M/sec                  
+   931.307.551.056      cycles                    #    2,917 GHz                      (39,99%)
+ 1.903.752.005.049      instructions              #    2,04  insn per cycle         
+                                                  #    0,27  stalled cycles per insn  (40,11%)
+    22.577.128.323      stalled-cycles-frontend   #    2,42% frontend cycles idle     (40,12%)
+   513.323.807.086      stalled-cycles-backend    #   55,12% backend cycles idle      (40,17%)
+    33.668.521.254      cache-references          #  105,458 M/sec                    (40,11%)
+     5.782.807.052      cache-misses              #   17,176 % of all cache refs      (40,02%)
+   822.641.114.835      L1-dcache-loads           # 2576,707 M/sec                    (39,90%)
+    16.182.954.800      L1-dcache-load-misses     #    1,97% of all L1-dcache hits    (39,81%)
+   314.412.853.543      branches                  #  984,816 M/sec                    (39,88%)
+     1.731.027.333      branch-misses             #    0,55% of all branches          (39,88%)
+
+      51,320441270 seconds time elapsed
+
+     310,978187000 seconds user
+       9,173575000 seconds sys
+
+====================================================================
+Parser also do stats, compareAndSet, no merge rules
+====================================================================
+42,704,293 records read - 19,550 ms - 2,184,363 lines/s
+42,704,293 records read - 19,826 ms - 2,153,954 lines/s
+
+        209.072,20 msec task-clock                #    6,891 CPUs utilized          
+         2.366.407      context-switches          #    0,011 M/sec                  
+   613.723.706.129      cycles                    #    2,935 GHz                      (40,01%)
+ 1.038.206.245.850      instructions              #    1,69  insn per cycle         
+                                                  #    0,33  stalled cycles per insn  (40,03%)
+    16.875.031.545      stalled-cycles-frontend   #    2,75% frontend cycles idle     (40,05%)
+   344.368.348.471      stalled-cycles-backend    #   56,11% backend cycles idle      (39,99%)
+    22.559.633.453      cache-references          #  107,904 M/sec                    (39,98%)
+     4.482.027.074      cache-misses              #   19,867 % of all cache refs      (39,97%)
+   421.800.336.362      L1-dcache-loads           # 2017,487 M/sec                    (39,98%)
+    12.254.947.184      L1-dcache-load-misses     #    2,91% of all L1-dcache hits    (40,01%)
+   178.378.821.606      branches                  #  853,192 M/sec                    (39,99%)
+     1.140.354.696      branch-misses             #    0,64% of all branches          (39,99%)
+
+      30,340918665 seconds time elapsed
+
+     195,839065000 seconds user
+      13,398707000 seconds sys
+
+
+And merge rules
+===============================================================
+42,704,293 records read - 34,226 ms - 1,247,715 lines/s
+42,704,293 records read - 34,896 ms - 1,223,759 lines/s
+
+        338.892,33 msec task-clock                #    7,234 CPUs utilized          
+           863.142      context-switches          #    0,003 M/sec                  
+   964.289.322.387      cycles                    #    2,845 GHz                      (40,04%)
+ 1.990.676.418.157      instructions              #    2,06  insn per cycle         
+                                                  #    0,25  stalled cycles per insn  (39,97%)
+    27.599.499.726      stalled-cycles-frontend   #    2,86% frontend cycles idle     (39,97%)
+   495.291.851.087      stalled-cycles-backend    #   51,36% backend cycles idle      (39,97%)
+    35.762.798.614      cache-references          #  105,528 M/sec                    (39,98%)
+     5.948.041.635      cache-misses              #   16,632 % of all cache refs      (39,98%)
+   876.810.720.077      L1-dcache-loads           # 2587,284 M/sec                    (39,98%)
+    16.619.540.226      L1-dcache-load-misses     #    1,90% of all L1-dcache hits    (40,03%)
+   328.323.457.148      branches                  #  968,813 M/sec                    (40,03%)
+     1.986.173.957      branch-misses             #    0,60% of all branches          (40,04%)
+
+      46,848039457 seconds time elapsed
+
+     325,002494000 seconds user
+      14,084453000 seconds sys
+
+

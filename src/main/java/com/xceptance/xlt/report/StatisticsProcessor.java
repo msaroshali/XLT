@@ -15,18 +15,14 @@
  */
 package com.xceptance.xlt.report;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.threadly.concurrent.wrapper.KeyDistributedExecutor;
 
-import com.xceptance.common.util.SimpleArrayList;
-import com.xceptance.common.util.concurrent.DaemonThreadFactory;
 import com.xceptance.xlt.api.engine.Data;
 import com.xceptance.xlt.api.report.ReportProvider;
 import com.xceptance.xlt.report.DataParserThread.PostprocessedDataContainer;
@@ -58,25 +54,15 @@ class StatisticsProcessor
     private final List<ReportProvider> reportProviders;
 
     /**
-     * The thread pool for processing the statistics in providers in parallel
-     * Just per provider, because they are not synchronized
-     */
-    private final KeyDistributedExecutor statisticsMaintenanceExecutor;
-
-    /**
      * Constructor.
      *
      * @param reportProviders
      *            the configured report providers
-     * @param dispatcher
-     *            the dispatcher that coordinates result processing
      */
-    public StatisticsProcessor(final List<ReportProvider> reportProviders, final int threadCount)
+    public StatisticsProcessor(final List<ReportProvider> reportProviders)
     {
         // filter the list and take only the provider that really need runtime parsed data
         this.reportProviders = reportProviders.stream().filter(p -> p.wantsDataRecords()).collect(Collectors.toList());
-        
-        statisticsMaintenanceExecutor = new KeyDistributedExecutor(Executors.newFixedThreadPool(threadCount, new DaemonThreadFactory(c -> "Providers-" + c)));
     }
 
     /**
@@ -107,82 +93,87 @@ class StatisticsProcessor
      */
     public void process(final PostprocessedDataContainer dataContainer)
     {
-        final List<Future<?>> tasks = new SimpleArrayList<>(reportProviders.size());
-
-        final List<Data> data = dataContainer.getData();
+        // get your own list
+        final Deque<ReportProvider> providerList = new ArrayDeque<>(reportProviders);
 
         /**
          * Create a task for each report provider and the full data set
          */
-        for (int i = 0; i < reportProviders.size(); i++)
+        final List<Data> data = dataContainer.getData();
+        while (providerList.isEmpty() == false)
         {
-            final ReportProvider reportProvider = reportProviders.get(i);
-
-            tasks.add(statisticsMaintenanceExecutor.submit(reportProvider, () ->
+            ReportProvider provider = null;
+        
+            int attemptsBeforeYielding = providerList.size();
+            do 
             {
-                try
+                provider = providerList.pollFirst();
+                final boolean wasLocked = provider.lock();
+                
+                if (wasLocked == false)
                 {
-                    final int size = data.size();
+                    providerList.addLast(provider);
+                    provider = null;
                     
-                    for (int d = 0; d < size; d++)
+                    if (attemptsBeforeYielding == 0)
                     {
-                        reportProvider.processDataRecord(data.get(d));
+                        attemptsBeforeYielding = 9;
+                        Thread.yield(); 
+                    }
+                    else
+                    {
+                        attemptsBeforeYielding--;
                     }
                 }
-                catch (final Throwable t)
-                {
-                    LOG.error("Failed to process data record, discarding full chunk", t);
-                }
-            }));
-        }
-        
-        // get the max and min
-        minimumTime = Math.min(minimumTime, dataContainer.getMinimumTime());
-        maximumTime = Math.max(maximumTime, dataContainer.getMaximumTime());
-        
-        // ok, we have to wait till the last provider is fed
-        for (int i = 0; i < tasks.size(); i++)
-        {
+            }
+            while (provider == null);
+                
             try
             {
-                tasks.get(i).get();
+                provider.processAll(data);
             }
-            catch (InterruptedException e)
+            catch (final Throwable t)
             {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                LOG.error("Failed to process data record, discarding full chunk", t);
             }
-            catch (ExecutionException e)
+            finally
             {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                provider.unlock();
+                attemptsBeforeYielding = 3; 
             }
+        }
+
+        // get the max and min
+        synchronized (this)
+        {
+            minimumTime = Math.min(minimumTime, dataContainer.getMinimumTime());
+            maximumTime = Math.max(maximumTime, dataContainer.getMaximumTime());
         }
     }
 
-//    /**
-//     * Maintain our statistics
-//     *
-//     * @param data
-//     *            the data records
-//     */
-//    private void maintainStatistics(final List<Data> data)
-//    {
-//        long min = minimumTime;
-//        long max = maximumTime;
-//
-//        // process the data
-//        final int size = data.size();
-//        for (int i = 0; i < size; i++)
-//        {
-//            // maintain statistics
-//            final long time = data.get(i).getTime();
-//
-//            min = Math.min(min, time);
-//            max = Math.max(max, time);
-//        }
-//
-//        minimumTime = min;
-//        maximumTime = max;
-//    }
+    //    /**
+    //     * Maintain our statistics
+    //     *
+    //     * @param data
+    //     *            the data records
+    //     */
+    //    private void maintainStatistics(final List<Data> data)
+    //    {
+    //        long min = minimumTime;
+    //        long max = maximumTime;
+    //
+    //        // process the data
+    //        final int size = data.size();
+    //        for (int i = 0; i < size; i++)
+    //        {
+    //            // maintain statistics
+    //            final long time = data.get(i).getTime();
+    //
+    //            min = Math.min(min, time);
+    //            max = Math.max(max, time);
+    //        }
+    //
+    //        minimumTime = min;
+    //        maximumTime = max;
+    //    }
 }

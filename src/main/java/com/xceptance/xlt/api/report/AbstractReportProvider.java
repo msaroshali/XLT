@@ -15,6 +15,11 @@
  */
 package com.xceptance.xlt.api.report;
 
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import com.xceptance.xlt.api.engine.Data;
+
 /**
  * The {@link AbstractReportProvider} class provides common functionality of a typical report provider.
  * 
@@ -27,6 +32,11 @@ public abstract class AbstractReportProvider implements ReportProvider
      */
     private ReportProviderConfiguration configuration;
 
+    /**
+     * locking
+     */
+    public final AtomicBoolean locked = new AtomicBoolean(false);
+    
     /**
      * Returns the report provider's configuration. Use the configuration object to get access to general as well as
      * provider-specific properties stored in the global configuration file.
@@ -45,5 +55,26 @@ public abstract class AbstractReportProvider implements ReportProvider
     public void setConfiguration(final ReportProviderConfiguration config)
     {
         configuration = config;
+    }
+    
+    @Override
+    public boolean lock()
+    {
+        return locked.compareAndSet(false, true);
+    }
+
+    @Override
+    public void unlock()
+    {
+        locked.set(false);
+    }
+    
+    public void processAll(final List<Data> data)
+    {
+        int size = data.size();
+        for (int d = 0; d < size; d++)
+        {
+            processDataRecord(data.get(d));
+        }
     }
 }
