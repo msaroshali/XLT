@@ -15,8 +15,6 @@
  */
 package com.xceptance.xlt.report;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
@@ -157,6 +155,9 @@ class DataParserThread implements Runnable
                             }
                             else
                             {
+                                // get us a hashcode for later while the cache is warm
+                                // for RequestData, we did that already
+                                data.getName().hashCode();
                                 postProcessedData.add(data);
                             }
                         }
@@ -310,6 +311,10 @@ class DataParserThread implements Runnable
             }
         }
 
+        // ok, we processed all rules for this dataset, get us the final hashcode for the name, because we need that later
+        // here the cache is likely still hot, so this is less expensive
+        requestData.getName().hashCode();
+        
         return requestData;
     }
 
