@@ -22,8 +22,6 @@ import org.apache.commons.lang3.StringUtils;
 import com.xceptance.common.lang.ParseNumbers;
 import com.xceptance.common.lang.StringHasher;
 import com.xceptance.common.util.XltCharBuffer;
-import com.xceptance.xlt.engine.util.FastString;
-import com.xceptance.xlt.engine.util.UrlUtils;
 import com.xceptance.xlt.report.util.UrlHostParser;
 
 /**
@@ -496,6 +494,17 @@ public class RequestData extends TimerData
     }
 
     /**
+     * Sets the request ID that was sent to the server.
+     * 
+     * @param id
+     *            the request ID
+     */
+    public void setRequestId(final String id)
+    {
+        this.requestId = XltCharBuffer.valueOf(id);
+    }
+    
+    /**
      * Sets the response ID that was sent back by the server.
      * 
      * @param id
@@ -506,6 +515,17 @@ public class RequestData extends TimerData
         this.responseId = id;
     }
 
+    /**
+     * Sets the response ID that was sent back by the server.
+     * 
+     * @param id
+     *            the response ID
+     */
+    public void setResponseId(final String id)
+    {
+        this.responseId = XltCharBuffer.valueOf(id);
+    }
+    
     /**
      * Sets the request's response code.
      * 
@@ -619,6 +639,17 @@ public class RequestData extends TimerData
     }
 
     /**
+     * Set the httpMethod value
+     * 
+     * @param httpMethod
+     *            the new httpMethod value
+     */
+    public void setHttpMethod(String httpMethod)
+    {
+        this.httpMethod = XltCharBuffer.valueOf(httpMethod);
+    }
+    
+    /**
      * Set the form data encoding.
      * 
      * @param encoding
@@ -630,6 +661,17 @@ public class RequestData extends TimerData
     }
 
     /**
+     * Set the form data encoding.
+     * 
+     * @param encoding
+     *            the new encoding
+     */
+    public void setFormDataEncoding(String encoding)
+    {
+        this.formDataEncoding = XltCharBuffer.valueOf(encoding);
+    }
+    
+    /**
      * Set the form data.
      * 
      * @param formData
@@ -640,6 +682,17 @@ public class RequestData extends TimerData
         this.formData = formData;
     }
 
+    /**
+     * Set the form data.
+     * 
+     * @param formData
+     *            the new data
+     */
+    public void setFormData(String formData)
+    {
+        this.formData = XltCharBuffer.valueOf(formData);
+    }
+    
     /**
      * Sets the time it took to look up the IP address for a host name.
      * 
